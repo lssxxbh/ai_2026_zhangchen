@@ -1,0 +1,356 @@
+2026-07-03 08:43:51 - medical_ai - WARNING - PaddleOCR not installed. OCR functionality will be limited.
+2026-07-03 09:52:33 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 10:05:00 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 10:06:26 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 10:26:39 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 10:34:20 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 10:35:11 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 10:35:11 - medical_ai - INFO - LLM initialized with provider: ollama, model: llama3.1
+2026-07-03 10:35:20 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 10:35:23 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 10:35:23 - medical_ai - INFO - LLM initialized with provider: ollama, model: llama3.1
+2026-07-03 10:35:23 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 10:43:31 - medical_ai - ERROR - Register error: password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])
+2026-07-03 10:43:44 - medical_ai - ERROR - Register error: password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])
+2026-07-03 10:44:36 - medical_ai - ERROR - Register error: password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])
+2026-07-03 10:51:16 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 10:51:20 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 10:51:20 - medical_ai - INFO - LLM initialized with provider: ollama, model: llama3.1
+2026-07-03 10:51:28 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 10:51:30 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 10:51:30 - medical_ai - INFO - LLM initialized with provider: ollama, model: llama3.1
+2026-07-03 10:51:30 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 10:53:43 - medical_ai - ERROR - Register error: password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])
+2026-07-03 10:54:52 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 10:54:54 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 10:54:54 - medical_ai - INFO - LLM initialized with provider: ollama, model: llama3.1
+2026-07-03 10:55:03 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 10:55:06 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 10:55:06 - medical_ai - INFO - LLM initialized with provider: ollama, model: llama3.1
+2026-07-03 10:55:06 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 10:58:27 - medical_ai - ERROR - Chat error: 'user' is not among the defined enum values. Enum name: messagerole. Possible values: USER, ASSISTANT
+2026-07-03 10:58:41 - medical_ai - ERROR - Chat error: 'user' is not among the defined enum values. Enum name: messagerole. Possible values: USER, ASSISTANT
+2026-07-03 10:58:57 - medical_ai - ERROR - Get history error: 'user' is not among the defined enum values. Enum name: messagerole. Possible values: USER, ASSISTANT
+2026-07-03 11:03:36 - medical_ai - INFO - Shutting down Medical AI System...
+2026-07-03 11:03:47 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 11:03:50 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 11:03:50 - medical_ai - INFO - LLM initialized with provider: ollama, model: llama3.1
+2026-07-03 11:03:51 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 11:13:03 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 11:13:06 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 11:13:06 - medical_ai - INFO - LLM initialized with provider: ollama, model: llama3.1
+2026-07-03 11:13:15 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 11:13:18 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 11:13:18 - medical_ai - INFO - LLM initialized with provider: ollama, model: llama3.1
+2026-07-03 11:13:19 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 11:13:53 - medical_ai - INFO - Text cleaned: 4 -> 4 chars
+2026-07-03 11:13:53 - medical_ai - INFO - Sending request to ollama model llama3.1
+2026-07-03 11:13:53 - medical_ai - ERROR - AI service error: Error code: 404 - {'error': {'message': "model 'llama3.1' not found", 'type': 'not_found_error', 'param': None, 'code': None}}
+2026-07-03 11:13:53 - medical_ai - INFO - Please make sure Ollama is running and model llama3.1 is pulled
+2026-07-03 14:42:36 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 14:42:39 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 14:42:39 - medical_ai - INFO - LLM initialized with provider: ollama, model: llama3.1
+2026-07-03 14:42:48 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 14:42:51 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 14:42:51 - medical_ai - INFO - LLM initialized with provider: ollama, model: llama3.1
+2026-07-03 14:42:51 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 14:56:31 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 14:56:34 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 14:56:34 - medical_ai - INFO - LLM initialized with provider: ollama, model: llama3.1
+2026-07-03 14:56:42 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 14:56:45 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 14:56:45 - medical_ai - INFO - LLM initialized with provider: ollama, model: llama3.1
+2026-07-03 14:56:45 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 14:58:59 - medical_ai - INFO - 开始解析文本: 血压21，身高230
+...
+2026-07-03 14:58:59 - medical_ai - INFO - Text cleaned: 11 -> 10 chars
+2026-07-03 14:58:59 - medical_ai - INFO - 文本清理完成
+2026-07-03 14:58:59 - medical_ai - INFO - Sending request to ollama model llama3.1
+2026-07-03 14:58:59 - medical_ai - ERROR - AI service error: Error code: 404 - {'error': {'message': "model 'llama3.1' not found", 'type': 'not_found_error', 'param': None, 'code': None}}
+Traceback (most recent call last):
+  File "C:\Users\csy\Desktop\20206.3ai\app1\services\ai_service.py", line 29, in parse_report
+    response = await self.client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\csy\AppData\Local\Programs\Python\Python311\Lib\site-packages\openai\resources\chat\completions.py", line 1720, in create
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\csy\AppData\Local\Programs\Python\Python311\Lib\site-packages\openai\_base_client.py", line 1843, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\csy\AppData\Local\Programs\Python\Python311\Lib\site-packages\openai\_base_client.py", line 1537, in request
+    return await self._request(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\csy\AppData\Local\Programs\Python\Python311\Lib\site-packages\openai\_base_client.py", line 1638, in _request
+    raise self._make_status_error_from_response(err.response) from None
+openai.NotFoundError: Error code: 404 - {'error': {'message': "model 'llama3.1' not found", 'type': 'not_found_error', 'param': None, 'code': None}}
+2026-07-03 14:58:59 - medical_ai - INFO - Falling back to mock parser
+2026-07-03 14:58:59 - medical_ai - INFO - 开始本地规则解析，文本长度: 10
+2026-07-03 14:58:59 - medical_ai - INFO - 解析文本前100字符: 血压21，身高230
+2026-07-03 14:58:59 - medical_ai - WARNING - 本地规则未提取到任何信息，返回文本预览
+2026-07-03 14:58:59 - medical_ai - INFO - 最终解析结果: {'text_preview': '血压21，身高230', 'message': '使用本地规则解析', '_source': 'local_rule_parser'}
+2026-07-03 14:58:59 - medical_ai - INFO - 解析完成
+2026-07-03 15:11:07 - medical_ai - INFO - Shutting down Medical AI System...
+2026-07-03 15:11:22 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 15:11:27 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 15:11:27 - medical_ai - INFO - LLM initialized with provider: ollama, model: llama3.1
+2026-07-03 15:11:27 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 15:16:10 - medical_ai - INFO - Shutting down Medical AI System...
+2026-07-03 15:16:20 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 15:16:23 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 15:16:23 - medical_ai - WARNING - 未配置LLM API密钥，将使用本地规则解析
+2026-07-03 15:16:23 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 15:27:45 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 15:27:49 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 15:27:49 - medical_ai - WARNING - 未配置ALIYUN_API_KEY环境变量，将使用本地规则解析
+2026-07-03 15:27:58 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 15:28:01 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 15:28:01 - medical_ai - WARNING - 未配置ALIYUN_API_KEY环境变量，将使用本地规则解析
+2026-07-03 15:28:01 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 15:29:05 - medical_ai - INFO - ==================================================
+2026-07-03 15:29:05 - medical_ai - INFO - 开始处理 chat 请求
+2026-07-03 15:29:05 - medical_ai - INFO - 开始解析文本: 示例体检报告
+
+姓名：张三
+性别：男
+年龄：28岁
+身高：175cm
+体重：68kg
+血压：118/76mmHg
+心率：72次/分
+
+
+体检结论：各项指标基本正常，建议保持规律作息、均衡饮食、适量运动
+2026-07-03 15:29:05 - medical_ai - INFO - 开始解析文本: 示例体检报告
+
+姓名：张三
+性别：男
+年龄：28岁
+身高：175cm
+体重：68kg
+血压：118/76mmHg
+心率：72次/分
+
+
+体检结论：各项指标基本正常，建议保持规律作息、均衡饮食、适量运动...
+2026-07-03 15:29:05 - medical_ai - INFO - Text cleaned: 109 -> 105 chars
+2026-07-03 15:29:05 - medical_ai - INFO - 文本清理完成
+2026-07-03 15:29:05 - medical_ai - WARNING - LLM未配置或无API密钥，使用本地规则解析
+2026-07-03 15:29:05 - medical_ai - INFO - 开始本地规则解析，文本长度: 105
+2026-07-03 15:29:05 - medical_ai - INFO - 解析文本前200字符: '示例体检报告\n姓名：张三\n性别：男\n年龄：28岁\n身高：175cm\n体重：68kg\n血压：118/76mmHg\n心率：72次/分\n体检结论：各项指标基本正常，建议保持规律作息、均衡饮食、适量运动，每年定期体检。'
+2026-07-03 15:29:05 - medical_ai - INFO - 清理后文本前200字符: '示例体检报告 姓名：张三 性别：男 年龄：28岁 身高：175cm 体重：68kg 血压：118/76mmHg 心率：72次/分 体检结论：各项指标基本正常，建议保持规律作息、均衡饮食、适量运动，每年定期体检。'
+2026-07-03 15:29:05 - medical_ai - INFO - 找到姓名: 张三
+2026-07-03 15:29:05 - medical_ai - INFO - 找到性别: 男
+2026-07-03 15:29:05 - medical_ai - INFO - 找到年龄: 28
+2026-07-03 15:29:05 - medical_ai - INFO - 找到身高: {'value': 175.0, 'unit': 'cm'}
+2026-07-03 15:29:05 - medical_ai - INFO - 找到体重: {'value': 68.0, 'unit': 'kg'}
+2026-07-03 15:29:05 - medical_ai - INFO - 找到血压: {'systolic': 118, 'diastolic': 76, 'unit': 'mmHg'}
+2026-07-03 15:29:05 - medical_ai - INFO - 找到心率: {'value': 72, 'unit': 'bpm'}
+2026-07-03 15:29:05 - medical_ai - INFO - 找到结论: 各项指标基本正常，建议保持规律作息、均衡饮食、适量运动，每年定期体检。...
+2026-07-03 15:29:05 - medical_ai - INFO - 本地规则解析成功，提取到 8 个字段
+2026-07-03 15:29:05 - medical_ai - INFO - 最终解析结果: {'name': '张三', 'gender': '男', 'age': 28, 'height': {'value': 175.0, 'unit': 'cm'}, 'weight': {'value': 68.0, 'unit': 'kg'}, 'blood_pressure': {'systolic': 118, 'diastolic': 76, 'unit': 'mmHg'}, 'heart_rate': {'value': 72, 'unit': 'bpm'}, 'conclusion': '各项指标基本正常，建议保持规律作息、均衡饮食、适量运动，每年定期体检。', '_source': 'local_rule_parser', '_text_length': 105}
+2026-07-03 15:29:05 - medical_ai - INFO - 解析完成
+2026-07-03 15:29:05 - medical_ai - INFO - 解析结果: {'name': '张三', 'gender': '男', 'age': 28, 'height': {'value': 175.0, 'unit': 'cm'}, 'weight': {'value': 68.0, 'unit': 'kg'}, 'blood_pressure': {'systolic': 118, 'diastolic': 76, 'unit': 'mmHg'}, 'heart_rate': {'value': 72, 'unit': 'bpm'}, 'conclusion': '各项指标基本正常，建议保持规律作息、均衡饮食、适量运动，每年定期体检。', '_source': 'local_rule_parser', '_text_length': 105}
+2026-07-03 15:29:05 - medical_ai - INFO - 请求处理完成
+2026-07-03 15:29:05 - medical_ai - INFO - ==================================================
+2026-07-03 15:29:36 - medical_ai - INFO - ==================================================
+2026-07-03 15:29:36 - medical_ai - INFO - 开始处理 chat 请求
+2026-07-03 15:29:36 - medical_ai - WARNING - 解析结果为空，使用默认值
+2026-07-03 15:29:36 - medical_ai - INFO - 请求处理完成
+2026-07-03 15:29:36 - medical_ai - INFO - ==================================================
+2026-07-03 15:37:35 - medical_ai - INFO - Shutting down Medical AI System...
+2026-07-03 15:37:45 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 15:37:48 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 15:37:48 - medical_ai - WARNING - 未配置ALIYUN_API_KEY环境变量，将使用本地规则解析
+2026-07-03 15:37:48 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 15:40:53 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 15:40:56 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 15:40:56 - medical_ai - WARNING - 未配置ALIYUN_API_KEY环境变量，将使用本地规则解析
+2026-07-03 15:41:17 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 15:41:20 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 15:41:20 - medical_ai - WARNING - 未配置ALIYUN_API_KEY环境变量，将使用本地规则解析
+2026-07-03 15:41:28 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 15:41:31 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 15:41:31 - medical_ai - WARNING - 未配置ALIYUN_API_KEY环境变量，将使用本地规则解析
+2026-07-03 15:41:31 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 15:45:41 - medical_ai - INFO - Shutting down Medical AI System...
+2026-07-03 15:45:52 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 15:45:55 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 15:45:55 - medical_ai - INFO - ============================================================
+2026-07-03 15:45:55 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 15:45:55 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 15:45:55 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 15:45:55 - medical_ai - INFO -   Model: qwen3.7-plus
+2026-07-03 15:45:55 - medical_ai - INFO -   API Key: 未配置
+2026-07-03 15:45:55 - medical_ai - INFO - ============================================================
+2026-07-03 15:45:55 - medical_ai - WARNING - 未配置ALIYUN_API_KEY环境变量，将使用本地规则解析
+2026-07-03 15:45:55 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 15:49:31 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 15:49:33 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 15:49:33 - medical_ai - INFO - ============================================================
+2026-07-03 15:49:33 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 15:49:33 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 15:49:33 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 15:49:33 - medical_ai - INFO -   Model: qwen3.7-plus
+2026-07-03 15:49:33 - medical_ai - INFO -   API Key: 未配置
+2026-07-03 15:49:33 - medical_ai - INFO - ============================================================
+2026-07-03 15:49:33 - medical_ai - WARNING - 未配置ALIYUN_API_KEY环境变量，将使用本地规则解析
+2026-07-03 15:49:42 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 15:49:45 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 15:49:45 - medical_ai - INFO - ============================================================
+2026-07-03 15:49:45 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 15:49:45 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 15:49:45 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 15:49:45 - medical_ai - INFO -   Model: qwen3.7-plus
+2026-07-03 15:49:45 - medical_ai - INFO -   API Key: 未配置
+2026-07-03 15:49:45 - medical_ai - INFO - ============================================================
+2026-07-03 15:49:45 - medical_ai - WARNING - 未配置ALIYUN_API_KEY环境变量，将使用本地规则解析
+2026-07-03 15:49:45 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 15:51:34 - medical_ai - INFO - Shutting down Medical AI System...
+2026-07-03 15:51:44 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 15:51:47 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 15:51:47 - medical_ai - INFO - ============================================================
+2026-07-03 15:51:47 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 15:51:47 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 15:51:47 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 15:51:47 - medical_ai - INFO -   Model: qwen3.7-plus
+2026-07-03 15:51:47 - medical_ai - INFO -   API Key: 未配置
+2026-07-03 15:51:47 - medical_ai - INFO - ============================================================
+2026-07-03 15:51:47 - medical_ai - WARNING - 未配置ALIYUN_API_KEY环境变量，将使用本地规则解析
+2026-07-03 15:51:48 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 15:54:08 - medical_ai - INFO - Shutting down Medical AI System...
+2026-07-03 15:54:18 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 15:54:21 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 15:54:21 - medical_ai - INFO - ============================================================
+2026-07-03 15:54:21 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 15:54:21 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 15:54:21 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 15:54:21 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 15:54:21 - medical_ai - INFO -   API Key: 未配置
+2026-07-03 15:54:21 - medical_ai - INFO - ============================================================
+2026-07-03 15:54:21 - medical_ai - WARNING - 未配置ALIYUN_API_KEY环境变量，将使用本地规则解析
+2026-07-03 15:54:21 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 15:56:16 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 15:56:19 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 15:56:19 - medical_ai - INFO - ============================================================
+2026-07-03 15:56:19 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 15:56:19 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 15:56:19 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 15:56:19 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 15:56:19 - medical_ai - INFO -   API Key: 未配置
+2026-07-03 15:56:19 - medical_ai - INFO - ============================================================
+2026-07-03 15:56:19 - medical_ai - WARNING - 未配置ALIYUN_API_KEY环境变量，将使用本地规则解析
+2026-07-03 15:56:28 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 15:56:30 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 15:56:30 - medical_ai - INFO - ============================================================
+2026-07-03 15:56:30 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 15:56:30 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 15:56:30 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 15:56:30 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 15:56:30 - medical_ai - INFO -   API Key: 未配置
+2026-07-03 15:56:30 - medical_ai - INFO - ============================================================
+2026-07-03 15:56:30 - medical_ai - WARNING - 未配置ALIYUN_API_KEY环境变量，将使用本地规则解析
+2026-07-03 15:56:30 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 15:58:43 - medical_ai - INFO - Shutting down Medical AI System...
+2026-07-03 15:58:52 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 15:58:55 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 15:58:55 - medical_ai - INFO - ============================================================
+2026-07-03 15:58:55 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 15:58:55 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 15:58:55 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 15:58:55 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 15:58:55 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 15:58:55 - medical_ai - INFO - ============================================================
+2026-07-03 15:58:55 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 15:58:55 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 16:01:44 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:01:46 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:01:46 - medical_ai - INFO - ============================================================
+2026-07-03 16:01:46 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:01:46 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:01:46 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:01:46 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:01:46 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:01:46 - medical_ai - INFO - ============================================================
+2026-07-03 16:01:46 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:01:54 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:01:57 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:01:57 - medical_ai - INFO - ============================================================
+2026-07-03 16:01:57 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:01:57 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:01:57 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:01:57 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:01:57 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:01:57 - medical_ai - INFO - ============================================================
+2026-07-03 16:01:57 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:01:57 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 16:03:30 - medical_ai - INFO - ==================================================
+2026-07-03 16:03:30 - medical_ai - INFO - 开始处理 chat 请求
+2026-07-03 16:03:30 - medical_ai - WARNING - 解析结果为空，使用默认值
+2026-07-03 16:03:31 - medical_ai - INFO - 请求处理完成
+2026-07-03 16:03:31 - medical_ai - INFO - ==================================================
+2026-07-03 16:08:43 - medical_ai - INFO - Shutting down Medical AI System...
+2026-07-03 16:08:52 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:08:55 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:08:55 - medical_ai - INFO - ============================================================
+2026-07-03 16:08:55 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:08:55 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:08:55 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:08:55 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:08:55 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:08:55 - medical_ai - INFO - ============================================================
+2026-07-03 16:08:55 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:08:55 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 16:14:05 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:14:08 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:14:08 - medical_ai - INFO - ============================================================
+2026-07-03 16:14:08 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:14:08 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:14:08 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:14:08 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:14:08 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:14:08 - medical_ai - INFO - ============================================================
+2026-07-03 16:14:08 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:14:17 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:14:19 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:14:19 - medical_ai - INFO - ============================================================
+2026-07-03 16:14:19 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:14:19 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:14:19 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:14:19 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:14:19 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:14:19 - medical_ai - INFO - ============================================================
+2026-07-03 16:14:19 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:14:20 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 16:23:45 - medical_ai - INFO - Shutting down Medical AI System...
+2026-07-03 16:23:55 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:23:58 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:23:58 - medical_ai - INFO - ============================================================
+2026-07-03 16:23:58 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:23:58 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:23:58 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:23:58 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:23:58 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:23:58 - medical_ai - INFO - ============================================================
+2026-07-03 16:23:58 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:23:58 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 16:24:54 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:24:57 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:24:57 - medical_ai - INFO - ============================================================
+2026-07-03 16:24:57 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:24:57 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:24:57 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:24:57 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:24:57 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:24:57 - medical_ai - INFO - ============================================================
+2026-07-03 16:24:57 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:25:05 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:25:08 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:25:08 - medical_ai - INFO - ============================================================
+2026-07-03 16:25:08 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:25:08 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:25:08 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:25:08 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:25:08 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:25:08 - medical_ai - INFO - ============================================================
+2026-07-03 16:25:08 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:25:08 - medical_ai - INFO - Starting Medical AI System...
