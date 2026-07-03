@@ -354,3 +354,8 @@ openai.NotFoundError: Error code: 404 - {'error': {'message': "model 'llama3.1' 
 2026-07-03 16:25:08 - medical_ai - INFO - ============================================================
 2026-07-03 16:25:08 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
 2026-07-03 16:25:08 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 16:26:52 - medical_ai - INFO - ==================================================
+2026-07-03 16:26:52 - medical_ai - INFO - 开始处理 chat 请求
+2026-07-03 16:26:52 - medical_ai - WARNING - 解析结果为空，使用默认值
+2026-07-03 16:26:52 - medical_ai - INFO - 请求处理完成
+2026-07-03 16:26:52 - medical_ai - INFO - ==================================================

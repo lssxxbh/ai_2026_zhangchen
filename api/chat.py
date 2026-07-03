@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from fastapi import APIRouter, Depends, UploadFile, File, Form
+from fastapi import APIRouter, Depends, UploadFile, File, Form, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
 from database import get_db
@@ -30,6 +30,7 @@ parser_service = ParserService(ocr_service, pdf_service, text_clean_service, ai_
 
 @router.post("/chat")
 async def chat(
+    request: Request,
     text: str = Form(""),
     conversation_id: int = Form(None),
     file: UploadFile = File(None),
@@ -39,6 +40,15 @@ async def chat(
     try:
         logger.info("="*50)
         logger.info("开始处理 chat 请求")
+        
+        # 超级详细的调试日志
+        logger.info(f"DEBUG: text = {repr(text)}")
+        logger.info(f"DEBUG: conversation_id = {conversation_id}")
+        logger.info(f"DEBUG: file = {file}")
+        if file:
+            logger.info(f"DEBUG: file.filename = {file.filename}")
+            logger.info(f"DEBUG: file.content_type = {file.content_type}")
+        
         conv_service = ConversationService(db)
 
         if conversation_id:
@@ -89,10 +99,13 @@ async def chat(
             # 先尝试提取文本，即使后面解析失败也能返回原始文本
             try:
                 if file_type == "pdf":
+                    logger.info("DEBUG: 处理PDF文件")
                     extracted_text = await pdf_service.extract_text(file_path) or ""
                 elif file_type in ["png", "jpg", "jpeg", "bmp", "image"]:
+                    logger.info("DEBUG: 处理图片文件")
                     extracted_text = await ocr_service.extract_text(file_path) or ""
                 elif file_type == "txt":
+                    logger.info("DEBUG: 处理TXT文件")
                     extracted_text = file_path.read_text(encoding="utf-8", errors="ignore")
                 
                 logger.info(f"文件提取到 {len(extracted_text)} 字符的文本")
@@ -113,6 +126,8 @@ async def chat(
             extracted_text = text
             parsed_json = await parser_service.parse_text(text)
             logger.info(f"解析结果: {parsed_json}")
+        else:
+            logger.warning("没有收到文件，也没有收到文本！")
 
         if not parsed_json:
             logger.warning("解析结果为空，使用默认值")
@@ -153,3 +168,4 @@ async def chat(
     except Exception as e:
         logger.error(f"Chat error: {e}", exc_info=True)
         return error_response(msg=str(e))
+
