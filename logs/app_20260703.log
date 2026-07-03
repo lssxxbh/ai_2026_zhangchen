@@ -426,3 +426,264 @@ openai.NotFoundError: Error code: 404 - {'error': {'message': "model 'llama3.1' 
 2026-07-03 16:37:23 - medical_ai - WARNING - 解析结果为空，使用默认值
 2026-07-03 16:37:23 - medical_ai - INFO - 请求处理完成
 2026-07-03 16:37:23 - medical_ai - INFO - ==================================================
+2026-07-03 16:40:23 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:40:26 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:40:26 - medical_ai - INFO - ============================================================
+2026-07-03 16:40:26 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:40:26 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:40:26 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:40:26 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:40:26 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:40:26 - medical_ai - INFO - ============================================================
+2026-07-03 16:40:26 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:40:34 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:40:37 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:40:37 - medical_ai - INFO - ============================================================
+2026-07-03 16:40:37 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:40:37 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:40:37 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:40:37 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:40:37 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:40:37 - medical_ai - INFO - ============================================================
+2026-07-03 16:40:37 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:40:37 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 16:41:37 - medical_ai - INFO - ==================================================
+2026-07-03 16:41:37 - medical_ai - INFO - 开始处理 chat 请求
+2026-07-03 16:41:37 - medical_ai - INFO - DEBUG: text = ''
+2026-07-03 16:41:37 - medical_ai - INFO - DEBUG: conversation_id = None
+2026-07-03 16:41:37 - medical_ai - INFO - DEBUG: file = None
+2026-07-03 16:41:37 - medical_ai - WARNING - 没有收到文件，也没有收到文本！
+2026-07-03 16:41:37 - medical_ai - WARNING - 解析结果为空，使用默认值
+2026-07-03 16:41:37 - medical_ai - INFO - 请求处理完成
+2026-07-03 16:41:38 - medical_ai - INFO - ==================================================
+2026-07-03 16:42:21 - medical_ai - INFO - ==================================================
+2026-07-03 16:42:21 - medical_ai - INFO - 开始处理 chat 请求
+2026-07-03 16:42:21 - medical_ai - INFO - DEBUG: text = ''
+2026-07-03 16:42:21 - medical_ai - INFO - DEBUG: conversation_id = 14
+2026-07-03 16:42:21 - medical_ai - INFO - DEBUG: file = None
+2026-07-03 16:42:21 - medical_ai - WARNING - 没有收到文件，也没有收到文本！
+2026-07-03 16:42:21 - medical_ai - WARNING - 解析结果为空，使用默认值
+2026-07-03 16:42:21 - medical_ai - INFO - 请求处理完成
+2026-07-03 16:42:21 - medical_ai - INFO - ==================================================
+2026-07-03 16:45:15 - medical_ai - INFO - Shutting down Medical AI System...
+2026-07-03 16:45:24 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:45:26 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:45:26 - medical_ai - INFO - ============================================================
+2026-07-03 16:45:26 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:45:26 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:45:26 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:45:26 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:45:26 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:45:26 - medical_ai - INFO - ============================================================
+2026-07-03 16:45:26 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:45:27 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 16:48:18 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:48:20 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:48:20 - medical_ai - INFO - ============================================================
+2026-07-03 16:48:20 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:48:20 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:48:20 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:48:20 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:48:20 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:48:20 - medical_ai - INFO - ============================================================
+2026-07-03 16:48:20 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:48:29 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:48:32 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:48:32 - medical_ai - INFO - ============================================================
+2026-07-03 16:48:32 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:48:32 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:48:32 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:48:32 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:48:32 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:48:32 - medical_ai - INFO - ============================================================
+2026-07-03 16:48:32 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:48:32 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 16:50:33 - medical_ai - INFO - ==================================================
+2026-07-03 16:50:33 - medical_ai - INFO - 开始处理 chat 请求
+2026-07-03 16:50:33 - medical_ai - INFO - DEBUG: text = ''
+2026-07-03 16:50:33 - medical_ai - INFO - DEBUG: conversation_id = None
+2026-07-03 16:50:33 - medical_ai - INFO - DEBUG: file = UploadFile(filename='test_report.txt', size=326, headers=Headers({'content-disposition': 'form-data; name="file"; filename="test_report.txt"', 'content-type': 'application/octet-stream'}))
+2026-07-03 16:50:33 - medical_ai - INFO - DEBUG: file.filename = test_report.txt
+2026-07-03 16:50:33 - medical_ai - INFO - DEBUG: file.content_type = application/octet-stream
+2026-07-03 16:50:33 - medical_ai - INFO - 收到文件: filename=test_report.txt, content_type=application/octet-stream
+2026-07-03 16:50:33 - medical_ai - INFO - 文件类型: txt
+2026-07-03 16:50:33 - medical_ai - INFO - 保存文件到: C:\Users\csy\Desktop\20206.3ai\app1\uploads\20260703165033_test_report.txt
+2026-07-03 16:50:33 - medical_ai - INFO - 文件大小: 326 bytes
+2026-07-03 16:50:33 - medical_ai - INFO - 文件保存成功
+2026-07-03 16:50:33 - medical_ai - INFO - 开始解析文件，类型: txt
+2026-07-03 16:50:33 - medical_ai - INFO - DEBUG: 处理TXT文件
+2026-07-03 16:50:33 - medical_ai - INFO - 文件提取到 150 字符的文本
+2026-07-03 16:50:33 - medical_ai - INFO - 文本预览: '示例体检报告\n\n姓名：张三\n性别：男\n年龄：28岁\n身高：175cm\n体重：68kg\n血压：118/76mmHg\n心率：72次/分\n空腹血糖：5.2mmol/L\n总胆固醇：4.8mmol/L\n血红蛋白：145g/L\n\n体检结论：各项指标基本正常，建议保持规律作息、均衡饮食、适量运动，每年定期体检。\n'
+2026-07-03 16:50:33 - medical_ai - INFO - 开始解析文件: C:\Users\csy\Desktop\20206.3ai\app1\uploads\20260703165033_test_report.txt, 类型: txt
+2026-07-03 16:50:33 - medical_ai - INFO - 直接读取文本文件
+2026-07-03 16:50:33 - medical_ai - INFO - 文本文件读取到 150 字符
+2026-07-03 16:50:33 - medical_ai - INFO - 开始清理文本，原始长度: 150
+2026-07-03 16:50:33 - medical_ai - INFO - Text cleaned: 150 -> 147 chars
+2026-07-03 16:50:33 - medical_ai - INFO - 文本清理完成，长度: 147
+2026-07-03 16:50:33 - medical_ai - INFO - 开始 AI 解析
+2026-07-03 16:50:33 - medical_ai - INFO - 开始调用LLM: qwen-plus
+2026-07-03 16:50:36 - medical_ai - INFO - LLM解析成功
+2026-07-03 16:50:36 - medical_ai - INFO - AI 解析完成，结果: {'姓名': '张三', '性别': '男', '年龄': '28岁', '身高': '175cm', '体重': '68kg', '血压': '118/76mmHg', '心率': '72次/分', '空腹血糖': '5.2mmol/L', '总胆固醇': '4.8mmol/L', '血红蛋白': '145g/L', '体检结论': '各项指标基本正常，建议保持规律作息、均衡饮食、适量运动，每年定期体检。', '_source': 'llm'}
+2026-07-03 16:50:36 - medical_ai - INFO - 完整解析结果: {'姓名': '张三', '性别': '男', '年龄': '28岁', '身高': '175cm', '体重': '68kg', '血压': '118/76mmHg', '心率': '72次/分', '空腹血糖': '5.2mmol/L', '总胆固醇': '4.8mmol/L', '血红蛋白': '145g/L', '体检结论': '各项指标基本正常，建议保持规律作息、均衡饮食、适量运动，每年定期体检。', '_source': 'llm'}
+2026-07-03 16:50:36 - medical_ai - INFO - 请求处理完成
+2026-07-03 16:50:36 - medical_ai - INFO - ==================================================
+2026-07-03 16:51:03 - medical_ai - INFO - ==================================================
+2026-07-03 16:51:03 - medical_ai - INFO - 开始处理 chat 请求
+2026-07-03 16:51:03 - medical_ai - INFO - DEBUG: text = ''
+2026-07-03 16:51:03 - medical_ai - INFO - DEBUG: conversation_id = None
+2026-07-03 16:51:03 - medical_ai - INFO - DEBUG: file = UploadFile(filename='示例体检报告.pdf', size=3344, headers=Headers({'content-disposition': 'form-data; name="file"; filename="ç¤ºä¾\x8bä½\x93æ£\x80æ\x8a¥å\x91\x8a.pdf"', 'content-type': 'application/octet-stream'}))
+2026-07-03 16:51:03 - medical_ai - INFO - DEBUG: file.filename = 示例体检报告.pdf
+2026-07-03 16:51:03 - medical_ai - INFO - DEBUG: file.content_type = application/octet-stream
+2026-07-03 16:51:03 - medical_ai - INFO - 收到文件: filename=示例体检报告.pdf, content_type=application/octet-stream
+2026-07-03 16:51:03 - medical_ai - INFO - 文件类型: pdf
+2026-07-03 16:51:03 - medical_ai - INFO - 保存文件到: C:\Users\csy\Desktop\20206.3ai\app1\uploads\20260703165103_示例体检报告.pdf
+2026-07-03 16:51:03 - medical_ai - INFO - 文件大小: 3344 bytes
+2026-07-03 16:51:03 - medical_ai - INFO - 文件保存成功
+2026-07-03 16:51:03 - medical_ai - INFO - 开始解析文件，类型: pdf
+2026-07-03 16:51:03 - medical_ai - INFO - DEBUG: 处理PDF文件
+2026-07-03 16:51:03 - medical_ai - INFO - 开始提取PDF文本: C:\Users\csy\Desktop\20206.3ai\app1\uploads\20260703165103_示例体检报告.pdf
+2026-07-03 16:51:03 - medical_ai - INFO - PDF页数: 1
+2026-07-03 16:51:03 - medical_ai - INFO - 第 1 页提取到 229 字符
+2026-07-03 16:51:03 - medical_ai - INFO - 合并后总长度: 229 字符
+2026-07-03 16:51:03 - medical_ai - INFO - PDF提取完成，最终文本长度: 229
+2026-07-03 16:51:03 - medical_ai - INFO - 前200字符: '示例体检报告（虚构，仅供测试）\n项目\n结果\n参考范围\n姓名\n张三（示例）\n-\n性别\n男\n-\n年龄\n28\n-\n身高\n175 cm\n-\n体重\n68 kg\n-\n血压\n118/76 mmHg\n90-140/60-90\n心率\n72 次/分\n60-100\n空腹血糖\n5.2 mmol/L\n3.9-6.1\n总胆固醇\n4.8 mmol/L\n<5.2\n血红蛋白\n145 g/L\n130-175\n体检结论：各项指标基本正'
+2026-07-03 16:51:03 - medical_ai - INFO - 文件提取到 229 字符的文本
+2026-07-03 16:51:03 - medical_ai - INFO - 文本预览: '示例体检报告（虚构，仅供测试）\n项目\n结果\n参考范围\n姓名\n张三（示例）\n-\n性别\n男\n-\n年龄\n28\n-\n身高\n175 cm\n-\n体重\n68 kg\n-\n血压\n118/76 mmHg\n90-140/60-90\n心率\n72 次/分\n60-100\n空腹血糖\n5.2 mmol/L\n3.9-6.1\n总胆固醇\n4.8 mmol/L\n<5.2\n血红蛋白\n145 g/L\n130-175\n体检结论：各项指标基本正'
+2026-07-03 16:51:03 - medical_ai - INFO - 开始解析文件: C:\Users\csy\Desktop\20206.3ai\app1\uploads\20260703165103_示例体检报告.pdf, 类型: pdf
+2026-07-03 16:51:03 - medical_ai - INFO - 使用 PDF 服务解析
+2026-07-03 16:51:03 - medical_ai - INFO - 开始提取PDF文本: C:\Users\csy\Desktop\20206.3ai\app1\uploads\20260703165103_示例体检报告.pdf
+2026-07-03 16:51:03 - medical_ai - INFO - PDF页数: 1
+2026-07-03 16:51:03 - medical_ai - INFO - 第 1 页提取到 229 字符
+2026-07-03 16:51:03 - medical_ai - INFO - 合并后总长度: 229 字符
+2026-07-03 16:51:03 - medical_ai - INFO - PDF提取完成，最终文本长度: 229
+2026-07-03 16:51:03 - medical_ai - INFO - 前200字符: '示例体检报告（虚构，仅供测试）\n项目\n结果\n参考范围\n姓名\n张三（示例）\n-\n性别\n男\n-\n年龄\n28\n-\n身高\n175 cm\n-\n体重\n68 kg\n-\n血压\n118/76 mmHg\n90-140/60-90\n心率\n72 次/分\n60-100\n空腹血糖\n5.2 mmol/L\n3.9-6.1\n总胆固醇\n4.8 mmol/L\n<5.2\n血红蛋白\n145 g/L\n130-175\n体检结论：各项指标基本正'
+2026-07-03 16:51:03 - medical_ai - INFO - PDF 提取到 229 字符
+2026-07-03 16:51:03 - medical_ai - INFO - 开始清理文本，原始长度: 229
+2026-07-03 16:51:03 - medical_ai - INFO - Text cleaned: 229 -> 228 chars
+2026-07-03 16:51:03 - medical_ai - INFO - 文本清理完成，长度: 228
+2026-07-03 16:51:03 - medical_ai - INFO - 开始 AI 解析
+2026-07-03 16:51:03 - medical_ai - INFO - 开始调用LLM: qwen-plus
+2026-07-03 16:51:07 - medical_ai - INFO - LLM解析成功
+2026-07-03 16:51:07 - medical_ai - INFO - AI 解析完成，结果: {'姓名': '张三（示例）', '性别': '男', '年龄': 28, '身高': '175 cm', '体重': '68 kg', '血压': '118/76 mmHg', '血压_参考范围': '90-140/60-90', '心率': '72 次/分', '心率_参考范围': '60-100', '空腹血糖': '5.2 mmol/L', '空腹血糖_参考范围': '3.9-6.1', '总胆固醇': '4.8 mmol/L', '总胆固醇_参考范围': '<5.2', '血红蛋白': '145 g/L', '血红蛋白_参考范围': '130-175', '体检结论': '各项指标基本正常，建议保持规律作息、均衡饮食、适量运动，每年定期体检。', '_source': 'llm'}
+2026-07-03 16:51:07 - medical_ai - INFO - 完整解析结果: {'姓名': '张三（示例）', '性别': '男', '年龄': 28, '身高': '175 cm', '体重': '68 kg', '血压': '118/76 mmHg', '血压_参考范围': '90-140/60-90', '心率': '72 次/分', '心率_参考范围': '60-100', '空腹血糖': '5.2 mmol/L', '空腹血糖_参考范围': '3.9-6.1', '总胆固醇': '4.8 mmol/L', '总胆固醇_参考范围': '<5.2', '血红蛋白': '145 g/L', '血红蛋白_参考范围': '130-175', '体检结论': '各项指标基本正常，建议保持规律作息、均衡饮食、适量运动，每年定期体检。', '_source': 'llm'}
+2026-07-03 16:51:07 - medical_ai - INFO - 请求处理完成
+2026-07-03 16:51:07 - medical_ai - INFO - ==================================================
+2026-07-03 16:55:33 - medical_ai - INFO - Shutting down Medical AI System...
+2026-07-03 16:55:43 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:55:46 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:55:46 - medical_ai - INFO - ============================================================
+2026-07-03 16:55:46 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:55:46 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:55:46 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:55:46 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:55:46 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:55:46 - medical_ai - INFO - ============================================================
+2026-07-03 16:55:46 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:55:46 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 16:59:26 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:59:29 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:59:29 - medical_ai - INFO - ============================================================
+2026-07-03 16:59:29 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:59:29 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:59:29 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:59:29 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:59:29 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:59:29 - medical_ai - INFO - ============================================================
+2026-07-03 16:59:29 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:59:38 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:59:41 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:59:41 - medical_ai - INFO - ============================================================
+2026-07-03 16:59:41 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:59:41 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:59:41 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:59:41 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:59:41 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:59:41 - medical_ai - INFO - ============================================================
+2026-07-03 16:59:41 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:59:41 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 17:00:34 - medical_ai - INFO - ==================================================
+2026-07-03 17:00:34 - medical_ai - INFO - 开始处理 chat 请求
+2026-07-03 17:00:34 - medical_ai - INFO - DEBUG: text = ''
+2026-07-03 17:00:34 - medical_ai - INFO - DEBUG: conversation_id = None
+2026-07-03 17:00:34 - medical_ai - INFO - DEBUG: file = UploadFile(filename='完整示例体检报告.pdf', size=4300, headers=Headers({'content-disposition': 'form-data; name="file"; filename="å®\x8cæ\x95´ç¤ºä¾\x8bä½\x93æ£\x80æ\x8a¥å\x91\x8a.pdf"', 'content-type': 'application/octet-stream'}))
+2026-07-03 17:00:34 - medical_ai - INFO - DEBUG: file.filename = 完整示例体检报告.pdf
+2026-07-03 17:00:34 - medical_ai - INFO - DEBUG: file.content_type = application/octet-stream
+2026-07-03 17:00:35 - medical_ai - INFO - 收到文件: filename=完整示例体检报告.pdf, content_type=application/octet-stream
+2026-07-03 17:00:35 - medical_ai - INFO - 文件类型: pdf
+2026-07-03 17:00:35 - medical_ai - INFO - 保存文件到: C:\Users\csy\Desktop\20206.3ai\app1\uploads\20260703170035_完整示例体检报告.pdf
+2026-07-03 17:00:35 - medical_ai - INFO - 文件大小: 4300 bytes
+2026-07-03 17:00:35 - medical_ai - INFO - 文件保存成功
+2026-07-03 17:00:35 - medical_ai - INFO - 开始解析文件，类型: pdf
+2026-07-03 17:00:35 - medical_ai - INFO - DEBUG: 处理PDF文件
+2026-07-03 17:00:35 - medical_ai - INFO - 开始提取PDF文本: C:\Users\csy\Desktop\20206.3ai\app1\uploads\20260703170035_完整示例体检报告.pdf
+2026-07-03 17:00:35 - medical_ai - INFO - PDF页数: 1
+2026-07-03 17:00:35 - medical_ai - INFO - 第 1 页提取到 645 字符
+2026-07-03 17:00:35 - medical_ai - INFO - 合并后总长度: 645 字符
+2026-07-03 17:00:35 - medical_ai - INFO - PDF提取完成，最终文本长度: 645
+2026-07-03 17:00:35 - medical_ai - INFO - 前200字符: '示例体检报告（虚构数据，仅供开发测试）\n姓名：张三 性别：男 年龄：28岁 体检日期：2026-07-02\n项目\n结果\n单位\n参考范围\n身高\n175\ncm\n-\n体重\n68\nkg\n-\nBMI\n22.2\n18.5-23.9\n血压\n118/76\nmmHg\n90-140/60-90\n脉搏\n72\n次/分\n60-100\nWBC\n6.25\n10^9/L\n3.5-9.5\nRBC\n4.82\n10^12/L\n4.3-'
+2026-07-03 17:00:35 - medical_ai - INFO - 文件提取到 645 字符的文本
+2026-07-03 17:00:35 - medical_ai - INFO - 文本预览: '示例体检报告（虚构数据，仅供开发测试）\n姓名：张三 性别：男 年龄：28岁 体检日期：2026-07-02\n项目\n结果\n单位\n参考范围\n身高\n175\ncm\n-\n体重\n68\nkg\n-\nBMI\n22.2\n18.5-23.9\n血压\n118/76\nmmHg\n90-140/60-90\n脉搏\n72\n次/分\n60-100\nWBC\n6.25\n10^9/L\n3.5-9.5\nRBC\n4.82\n10^12/L\n4.3-'
+2026-07-03 17:00:35 - medical_ai - INFO - 开始解析文件: C:\Users\csy\Desktop\20206.3ai\app1\uploads\20260703170035_完整示例体检报告.pdf, 类型: pdf
+2026-07-03 17:00:35 - medical_ai - INFO - 使用 PDF 服务解析
+2026-07-03 17:00:35 - medical_ai - INFO - 开始提取PDF文本: C:\Users\csy\Desktop\20206.3ai\app1\uploads\20260703170035_完整示例体检报告.pdf
+2026-07-03 17:00:35 - medical_ai - INFO - PDF页数: 1
+2026-07-03 17:00:35 - medical_ai - INFO - 第 1 页提取到 645 字符
+2026-07-03 17:00:35 - medical_ai - INFO - 合并后总长度: 645 字符
+2026-07-03 17:00:35 - medical_ai - INFO - PDF提取完成，最终文本长度: 645
+2026-07-03 17:00:35 - medical_ai - INFO - 前200字符: '示例体检报告（虚构数据，仅供开发测试）\n姓名：张三 性别：男 年龄：28岁 体检日期：2026-07-02\n项目\n结果\n单位\n参考范围\n身高\n175\ncm\n-\n体重\n68\nkg\n-\nBMI\n22.2\n18.5-23.9\n血压\n118/76\nmmHg\n90-140/60-90\n脉搏\n72\n次/分\n60-100\nWBC\n6.25\n10^9/L\n3.5-9.5\nRBC\n4.82\n10^12/L\n4.3-'
+2026-07-03 17:00:35 - medical_ai - INFO - PDF 提取到 645 字符
+2026-07-03 17:00:35 - medical_ai - INFO - 开始清理文本，原始长度: 645
+2026-07-03 17:00:35 - medical_ai - INFO - Text cleaned: 645 -> 644 chars
+2026-07-03 17:00:35 - medical_ai - INFO - 文本清理完成，长度: 644
+2026-07-03 17:00:35 - medical_ai - INFO - 开始 AI 解析
+2026-07-03 17:00:35 - medical_ai - INFO - 开始调用LLM: qwen-plus
+2026-07-03 17:00:54 - medical_ai - INFO - LLM解析成功
+2026-07-03 17:00:54 - medical_ai - INFO - AI 解析完成，结果: {'basic_info': {'name': '张三', 'gender': '男', 'age': 28, 'exam_date': '2026-07-02'}, 'physical_examination': {'height': {'value': 175, 'unit': 'cm'}, 'weight': {'value': 68, 'unit': 'kg'}, 'bmi': {'value': 22.2, 'reference_range': '18.5-23.9'}, 'blood_pressure': {'value': '118/76', 'unit': 'mmHg', 'reference_range': '90-140/60-90'}, 'pulse': {'value': 72, 'unit': '次/分', 'reference_range': '60-100'}}, 'laboratory_tests': {'blood_routine': {'WBC': {'value': 6.25, 'unit': '10^9/L', 'reference_range': '3.5-9.5'}, 'RBC': {'value': 4.82, 'unit': '10^12/L', 'reference_range': '4.3-5.8'}, 'HGB': {'value': 148, 'unit': 'g/L', 'reference_range': '130-175'}, 'HCT': {'value': 43.8, 'unit': '%', 'reference_range': '40-50'}, 'PLT': {'value': 235, 'unit': '10^9/L', 'reference_range': '125-350'}}, 'liver_function': {'ALT': {'value': 22, 'unit': 'U/L', 'reference_range': '9-50'}, 'AST': {'value': 20, 'unit': 'U/L', 'reference_range': '15-40'}, 'ALB': {'value': 46, 'unit': 'g/L', 'reference_range': '40-55'}, 'TBIL': {'value': 14.5, 'unit': 'μmol/L', 'reference_range': '5-21'}}, 'renal_function': {'Cr': {'value': 78, 'unit': 'μmol/L', 'reference_range': '57-111'}, 'UA': {'value': 356, 'unit': 'μmol/L', 'reference_range': '208-428'}, 'Urea': {'value': 5.2, 'unit': 'mmol/L', 'reference_range': '2.8-7.2'}}, 'glucose_metabolism': {'GLU': {'value': 5.2, 'unit': 'mmol/L', 'reference_range': '3.9-6.1'}, 'HbA1c': {'value': 5.4, 'unit': '%', 'reference_range': '4.0-6.0'}}, 'lipid_profile': {'TC': {'value': 4.8, 'unit': 'mmol/L', 'reference_range': '<5.2'}, 'TG': {'value': 1.2, 'unit': 'mmol/L', 'reference_range': '<1.7'}, 'HDL_C': {'value': 1.42, 'unit': 'mmol/L', 'reference_range': '>1.0'}, 'LDL_C': {'value': 2.65, 'unit': 'mmol/L', 'reference_range': '<3.4'}}, 'urinalysis': {'urine_protein': {'value': '阴性', 'reference_range': '阴性'}, 'urine_glucose': {'value': '阴性', 'reference_range': '阴性'}, 'occult_blood': {'value': '阴性', 'reference_range': '阴性'}, 'leukocytes': {'value': '阴性', 'reference_range': '阴性'}}}, 'instrumental_examinations': {'ecg': {'value': '窦性心律', 'reference_range': '正常'}, 'abdominal_ultrasound': {'value': '未见明显异常', 'reference_range': '正常'}, 'chest_xray': {'value': '未见明显异常', 'reference_range': '正常'}}, 'conclusion': '本次体检未发现明显异常。建议保持健康生活方式，每年定期体检。', '_source': 'llm'}
+2026-07-03 17:00:54 - medical_ai - INFO - 完整解析结果: {'basic_info': {'name': '张三', 'gender': '男', 'age': 28, 'exam_date': '2026-07-02'}, 'physical_examination': {'height': {'value': 175, 'unit': 'cm'}, 'weight': {'value': 68, 'unit': 'kg'}, 'bmi': {'value': 22.2, 'reference_range': '18.5-23.9'}, 'blood_pressure': {'value': '118/76', 'unit': 'mmHg', 'reference_range': '90-140/60-90'}, 'pulse': {'value': 72, 'unit': '次/分', 'reference_range': '60-100'}}, 'laboratory_tests': {'blood_routine': {'WBC': {'value': 6.25, 'unit': '10^9/L', 'reference_range': '3.5-9.5'}, 'RBC': {'value': 4.82, 'unit': '10^12/L', 'reference_range': '4.3-5.8'}, 'HGB': {'value': 148, 'unit': 'g/L', 'reference_range': '130-175'}, 'HCT': {'value': 43.8, 'unit': '%', 'reference_range': '40-50'}, 'PLT': {'value': 235, 'unit': '10^9/L', 'reference_range': '125-350'}}, 'liver_function': {'ALT': {'value': 22, 'unit': 'U/L', 'reference_range': '9-50'}, 'AST': {'value': 20, 'unit': 'U/L', 'reference_range': '15-40'}, 'ALB': {'value': 46, 'unit': 'g/L', 'reference_range': '40-55'}, 'TBIL': {'value': 14.5, 'unit': 'μmol/L', 'reference_range': '5-21'}}, 'renal_function': {'Cr': {'value': 78, 'unit': 'μmol/L', 'reference_range': '57-111'}, 'UA': {'value': 356, 'unit': 'μmol/L', 'reference_range': '208-428'}, 'Urea': {'value': 5.2, 'unit': 'mmol/L', 'reference_range': '2.8-7.2'}}, 'glucose_metabolism': {'GLU': {'value': 5.2, 'unit': 'mmol/L', 'reference_range': '3.9-6.1'}, 'HbA1c': {'value': 5.4, 'unit': '%', 'reference_range': '4.0-6.0'}}, 'lipid_profile': {'TC': {'value': 4.8, 'unit': 'mmol/L', 'reference_range': '<5.2'}, 'TG': {'value': 1.2, 'unit': 'mmol/L', 'reference_range': '<1.7'}, 'HDL_C': {'value': 1.42, 'unit': 'mmol/L', 'reference_range': '>1.0'}, 'LDL_C': {'value': 2.65, 'unit': 'mmol/L', 'reference_range': '<3.4'}}, 'urinalysis': {'urine_protein': {'value': '阴性', 'reference_range': '阴性'}, 'urine_glucose': {'value': '阴性', 'reference_range': '阴性'}, 'occult_blood': {'value': '阴性', 'reference_range': '阴性'}, 'leukocytes': {'value': '阴性', 'reference_range': '阴性'}}}, 'instrumental_examinations': {'ecg': {'value': '窦性心律', 'reference_range': '正常'}, 'abdominal_ultrasound': {'value': '未见明显异常', 'reference_range': '正常'}, 'chest_xray': {'value': '未见明显异常', 'reference_range': '正常'}}, 'conclusion': '本次体检未发现明显异常。建议保持健康生活方式，每年定期体检。', '_source': 'llm'}
+2026-07-03 17:00:54 - medical_ai - INFO - 请求处理完成
+2026-07-03 17:00:54 - medical_ai - INFO - ==================================================
+2026-07-03 17:04:14 - medical_ai - INFO - Shutting down Medical AI System...
+2026-07-03 17:04:24 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 17:04:27 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 17:04:27 - medical_ai - INFO - ============================================================
+2026-07-03 17:04:27 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 17:04:27 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 17:04:27 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 17:04:27 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 17:04:27 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 17:04:27 - medical_ai - INFO - ============================================================
+2026-07-03 17:04:27 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 17:04:27 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 17:05:08 - medical_ai - INFO - Shutting down Medical AI System...
+2026-07-03 17:16:51 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 17:16:54 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 17:16:54 - medical_ai - INFO - ============================================================
+2026-07-03 17:16:54 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 17:16:54 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 17:16:54 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 17:16:54 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 17:16:54 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 17:16:54 - medical_ai - INFO - ============================================================
+2026-07-03 17:16:54 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 17:17:03 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 17:17:06 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 17:17:06 - medical_ai - INFO - ============================================================
+2026-07-03 17:17:06 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 17:17:06 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 17:17:06 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 17:17:06 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 17:17:06 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 17:17:06 - medical_ai - INFO - ============================================================
+2026-07-03 17:17:06 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 17:17:06 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 17:17:29 - medical_ai - INFO - 收到文件: filename=fin.txt
+2026-07-03 17:17:29 - medical_ai - INFO - 开始解析文件: C:\Users\csy\Desktop\20206.3ai\app1\uploads\20260703171729_fin.txt, 类型: txt
+2026-07-03 17:17:29 - medical_ai - INFO - 直接读取文本文件
+2026-07-03 17:17:29 - medical_ai - INFO - 文本文件读取到 5541 字符
+2026-07-03 17:17:29 - medical_ai - INFO - 开始清理文本，原始长度: 5541
+2026-07-03 17:17:29 - medical_ai - INFO - Text cleaned: 5541 -> 4532 chars
+2026-07-03 17:17:29 - medical_ai - INFO - 文本清理完成，长度: 4532
+2026-07-03 17:17:29 - medical_ai - INFO - 开始 AI 解析
+2026-07-03 17:17:29 - medical_ai - INFO - 开始调用LLM: qwen-plus
+2026-07-03 17:17:30 - medical_ai - INFO - LLM解析成功
+2026-07-03 17:17:30 - medical_ai - INFO - AI 解析完成，结果: {'question': '最近头晕是什么原因', '_source': 'llm'}

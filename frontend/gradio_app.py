@@ -99,22 +99,43 @@ def create_gradio_app():
                     current_user_id = token_data["user_id"]
                     convs = load_conversations_list(current_token)
                     dropdown_choices = format_conversations_for_dropdown(convs)
-                    return (
-                        current_token,
-                        current_user_id,
-                        f"登录成功: {username}",
-                        gr.update(visible=False),
-                        gr.update(visible=True),
-                        True,
-                        "",
-                        convs,
-                        None,
-                        gr.update(choices=dropdown_choices, value=None)
-                    )
+                    
+                    # 检查是否有历史会话
+                    if not convs:
+                        # 新用户，显示欢迎消息
+                        welcome_history = [("", "欢迎使用智能体检报告解析系统！\n\n你可以：\n1. 上传体检报告 (PDF/图片/TXT)\n2. 直接输入文字\n3. 点击左侧按钮管理会话")]
+                        return (
+                            current_token,
+                            current_user_id,
+                            f"登录成功: {username}",
+                            gr.update(visible=False),
+                            gr.update(visible=True),
+                            True,
+                            welcome_history,
+                            "",
+                            convs,
+                            None,
+                            gr.update(choices=dropdown_choices, value=None)
+                        )
+                    else:
+                        # 有历史会话，聊天界面留空，让用户选择会话
+                        return (
+                            current_token,
+                            current_user_id,
+                            f"登录成功: {username}",
+                            gr.update(visible=False),
+                            gr.update(visible=True),
+                            True,
+                            [],
+                            "",
+                            convs,
+                            None,
+                            gr.update(choices=dropdown_choices, value=None)
+                        )
                 else:
-                    return None, None, data.get("msg", "登录失败"), gr.update(), gr.update(), False, "", [], None, gr.update(choices=[], value=None)
+                    return None, None, data.get("msg", "登录失败"), gr.update(), gr.update(), False, [], "", [], None, gr.update(choices=[], value=None)
             except Exception as e:
-                return None, None, f"错误: {str(e)}", gr.update(), gr.update(), False, "", [], None, gr.update(choices=[], value=None)
+                return None, None, f"错误: {str(e)}", gr.update(), gr.update(), False, [], "", [], None, gr.update(choices=[], value=None)
 
         # 处理注册
         def handle_register(username: str, password: str):
@@ -132,6 +153,9 @@ def create_gradio_app():
                     current_user_id = token_data["user_id"]
                     convs = load_conversations_list(current_token)
                     dropdown_choices = format_conversations_for_dropdown(convs)
+                    
+                    # 新用户，显示欢迎消息
+                    welcome_history = [("", "欢迎使用智能体检报告解析系统！\n\n你可以：\n1. 上传体检报告 (PDF/图片/TXT)\n2. 直接输入文字\n3. 点击左侧按钮管理会话")]
                     return (
                         current_token,
                         current_user_id,
@@ -139,15 +163,16 @@ def create_gradio_app():
                         gr.update(visible=False),
                         gr.update(visible=True),
                         True,
+                        welcome_history,
                         "",
                         convs,
                         None,
                         gr.update(choices=dropdown_choices, value=None)
                     )
                 else:
-                    return None, None, data.get("msg", "注册失败"), gr.update(), gr.update(), False, "", [], None, gr.update(choices=[], value=None)
+                    return None, None, data.get("msg", "注册失败"), gr.update(), gr.update(), False, [], "", [], None, gr.update(choices=[], value=None)
             except Exception as e:
-                return None, None, f"错误: {str(e)}", gr.update(), gr.update(), False, "", [], None, gr.update(choices=[], value=None)
+                return None, None, f"错误: {str(e)}", gr.update(), gr.update(), False, [], "", [], None, gr.update(choices=[], value=None)
 
         # 加载会话列表
         def load_conversations_list(token: Optional[str]):
@@ -283,6 +308,9 @@ def create_gradio_app():
         def get_file_name(file):
             if not file:
                 return None
+            # 处理 NamedString (直接是路径字符串)
+            if isinstance(file, str) or (hasattr(file, '__str__') and not hasattr(file, 'name')):
+                return Path(str(file)).name
             if isinstance(file, dict):
                 return file.get('name')
             if hasattr(file, 'name'):
@@ -295,6 +323,9 @@ def create_gradio_app():
         def get_file_path(file):
             if not file:
                 return None
+            # 处理 NamedString (直接是路径字符串)
+            if isinstance(file, str) or (hasattr(file, '__str__') and not hasattr(file, 'path')):
+                return str(file)
             if isinstance(file, dict):
                 return file.get('path')
             if hasattr(file, 'path'):
@@ -340,16 +371,20 @@ def create_gradio_app():
                 if conv_id:
                     data["conversation_id"] = conv_id
 
-                if file_path:
-                    files["file"] = (Path(file_display_name).name, open(file_path, "rb"), "application/octet-stream")
-                elif file and hasattr(file, 'read'):
-                    files["file"] = (file_display_name, file, "application/octet-stream")
+                # 处理文件
+                if file:
+                    if file_path:
+                        files["file"] = (Path(file_display_name).name, open(file_path, "rb"), "application/octet-stream")
+                    elif hasattr(file, 'name') and hasattr(file, 'read'):
+                        files["file"] = (file.name, file, "application/octet-stream")
+                    elif isinstance(file, dict) and 'name' in file and 'data' in file:
+                        files["file"] = (file['name'], file['data'], "application/octet-stream")
 
                 response = requests.post(
                     f"{API_BASE}/chat",
                     headers=headers,
                     data=data,
-                    files=files if file else None
+                    files=files if files else None
                 )
                 result = response.json()
 
@@ -384,6 +419,8 @@ def create_gradio_app():
                 login_row,
                 chat_row,
                 logged_in,
+                chatbot,
+                json_output,
                 conversations_cache,
                 conversation_id_state,
                 conversations_dropdown
@@ -400,6 +437,8 @@ def create_gradio_app():
                 login_row,
                 chat_row,
                 logged_in,
+                chatbot,
+                json_output,
                 conversations_cache,
                 conversation_id_state,
                 conversations_dropdown
