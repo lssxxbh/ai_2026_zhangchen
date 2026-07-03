@@ -359,3 +359,70 @@ openai.NotFoundError: Error code: 404 - {'error': {'message': "model 'llama3.1' 
 2026-07-03 16:26:52 - medical_ai - WARNING - 解析结果为空，使用默认值
 2026-07-03 16:26:52 - medical_ai - INFO - 请求处理完成
 2026-07-03 16:26:52 - medical_ai - INFO - ==================================================
+2026-07-03 16:31:49 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:31:54 - medical_ai - INFO - ============================================================
+2026-07-03 16:31:54 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:31:54 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:31:54 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:31:54 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:31:54 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:31:54 - medical_ai - INFO - ============================================================
+2026-07-03 16:31:54 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:31:54 - medical_ai - INFO - 开始本地规则解析，文本长度: 150
+2026-07-03 16:31:54 - medical_ai - INFO - 解析文本前200字符: '示例体检报告\n\n姓名：张三\n性别：男\n年龄：28岁\n身高：175cm\n体重：68kg\n血压：118/76mmHg\n心率：72次/分\n空腹血糖：5.2mmol/L\n总胆固醇：4.8mmol/L\n血红蛋白：145g/L\n\n体检结论：各项指标基本正常，建议保持规律作息、均衡饮食、适量运动，每年定期体检。\n'
+2026-07-03 16:31:54 - medical_ai - INFO - 清理后文本前200字符: '示例体检报告 姓名：张三 性别：男 年龄：28岁 身高：175cm 体重：68kg 血压：118/76mmHg 心率：72次/分 空腹血糖：5.2mmol/L 总胆固醇：4.8mmol/L 血红蛋白：145g/L 体检结论：各项指标基本正常，建议保持规律作息、均衡饮食、适量运动，每年定期体检。'
+2026-07-03 16:31:54 - medical_ai - INFO - 找到姓名: 张三
+2026-07-03 16:31:54 - medical_ai - INFO - 找到性别: 男
+2026-07-03 16:31:54 - medical_ai - INFO - 找到年龄: 28
+2026-07-03 16:31:54 - medical_ai - INFO - 找到身高: {'value': 175.0, 'unit': 'cm'}
+2026-07-03 16:31:54 - medical_ai - INFO - 找到体重: {'value': 68.0, 'unit': 'kg'}
+2026-07-03 16:31:54 - medical_ai - INFO - 找到血压: {'systolic': 118, 'diastolic': 76, 'unit': 'mmHg'}
+2026-07-03 16:31:54 - medical_ai - INFO - 找到心率: {'value': 72, 'unit': 'bpm'}
+2026-07-03 16:31:54 - medical_ai - INFO - 找到血糖: {'value': 5.2, 'unit': 'mmol/L'}
+2026-07-03 16:31:54 - medical_ai - INFO - 找到总胆固醇: {'value': 4.8, 'unit': 'mmol/L'}
+2026-07-03 16:31:54 - medical_ai - INFO - 找到血红蛋白: {'value': 145, 'unit': 'g/L'}
+2026-07-03 16:31:54 - medical_ai - INFO - 找到结论: 各项指标基本正常，建议保持规律作息、均衡饮食、适量运动，每年定期体检。...
+2026-07-03 16:31:54 - medical_ai - INFO - 本地规则解析成功，提取到 11 个字段
+2026-07-03 16:31:54 - medical_ai - INFO - 最终解析结果: {'name': '张三', 'gender': '男', 'age': 28, 'height': {'value': 175.0, 'unit': 'cm'}, 'weight': {'value': 68.0, 'unit': 'kg'}, 'blood_pressure': {'systolic': 118, 'diastolic': 76, 'unit': 'mmHg'}, 'heart_rate': {'value': 72, 'unit': 'bpm'}, 'fasting_blood_glucose': {'value': 5.2, 'unit': 'mmol/L'}, 'total_cholesterol': {'value': 4.8, 'unit': 'mmol/L'}, 'hemoglobin': {'value': 145, 'unit': 'g/L'}, 'conclusion': '各项指标基本正常，建议保持规律作息、均衡饮食、适量运动，每年定期体检。', '_source': 'local_rule_parser', '_text_length': 150}
+2026-07-03 16:34:44 - medical_ai - INFO - Shutting down Medical AI System...
+2026-07-03 16:34:56 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:34:59 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:34:59 - medical_ai - INFO - ============================================================
+2026-07-03 16:34:59 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:34:59 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:34:59 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:34:59 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:34:59 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:34:59 - medical_ai - INFO - ============================================================
+2026-07-03 16:34:59 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:34:59 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 16:35:51 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:35:54 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:35:54 - medical_ai - INFO - ============================================================
+2026-07-03 16:35:54 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:35:54 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:35:54 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:35:54 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:35:54 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:35:54 - medical_ai - INFO - ============================================================
+2026-07-03 16:35:54 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:36:02 - medical_ai - INFO - ✅ Using EasyOCR for OCR
+2026-07-03 16:36:05 - medical_ai - INFO - ✅ EasyOCR initialized successfully
+2026-07-03 16:36:05 - medical_ai - INFO - ============================================================
+2026-07-03 16:36:05 - medical_ai - INFO - LLM 配置信息:
+2026-07-03 16:36:05 - medical_ai - INFO -   Provider: aliyun
+2026-07-03 16:36:05 - medical_ai - INFO -   API Base: https://dashscope.aliyuncs.com/compatible-mode/v1
+2026-07-03 16:36:05 - medical_ai - INFO -   Model: qwen-plus
+2026-07-03 16:36:05 - medical_ai - INFO -   API Key: 已配置
+2026-07-03 16:36:05 - medical_ai - INFO - ============================================================
+2026-07-03 16:36:05 - medical_ai - INFO - LLM初始化成功: provider=aliyun, model=qwen-plus
+2026-07-03 16:36:05 - medical_ai - INFO - Starting Medical AI System...
+2026-07-03 16:37:22 - medical_ai - INFO - ==================================================
+2026-07-03 16:37:22 - medical_ai - INFO - 开始处理 chat 请求
+2026-07-03 16:37:22 - medical_ai - INFO - DEBUG: text = ''
+2026-07-03 16:37:22 - medical_ai - INFO - DEBUG: conversation_id = None
+2026-07-03 16:37:22 - medical_ai - INFO - DEBUG: file = None
+2026-07-03 16:37:23 - medical_ai - WARNING - 没有收到文件，也没有收到文本！
+2026-07-03 16:37:23 - medical_ai - WARNING - 解析结果为空，使用默认值
+2026-07-03 16:37:23 - medical_ai - INFO - 请求处理完成
+2026-07-03 16:37:23 - medical_ai - INFO - ==================================================
