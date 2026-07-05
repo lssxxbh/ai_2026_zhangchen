@@ -56,18 +56,27 @@ class AIService:
             content = response.choices[0].message.content
             if content:
                 result = self._parse_json_response(content)
-                result["ocr"] = {
-                    "source": "llm",
-                    "file_type": None,
-                    "text_extracted": True,
-                    "text_length": len(text),
-                    "parse_confidence": None,
-                    "raw_text": text[:1000]
-                }
+                # 只在有文本提取时才添加 ocr 信息
+                if text:
+                    result["ocr"] = {
+                        "source": "llm",
+                        "text_extracted": True,
+                        "text_length": len(text),
+                        "raw_text": text[:1000]
+                    }
                 logger.info(f"LLM解析成功")
                 return result
 
-            return self._get_empty_result(text)
+            # 如果没有结果，只返回 ocr 信息
+            result = {}
+            if text:
+                result["ocr"] = {
+                    "source": "llm",
+                    "text_extracted": False,
+                    "text_length": len(text),
+                    "raw_text": text[:1000]
+                }
+            return result
         except Exception as e:
             logger.error(f"LLM调用错误: {e}", exc_info=True)
             logger.info("降级到本地规则解析")
@@ -76,101 +85,45 @@ class AIService:
     def _build_prompt(self, text: str, user_question: Optional[str] = None) -> str:
         prompt = f"""你是一名医学信息抽取专家。
 
-请从以下体检报告文本中抽取信息并输出JSON，使用以下结构：
+请从以下体检报告文本中抽取信息并输出JSON。
 
+重要要求：
+1. 只抽取报告中真实存在的信息，没有的字段不要输出
+2. 不要编造数据
+3. 保持医学语义准确
+4. 数值不修改，单位不修改
+5. 只输出JSON，不输出任何其他解释文字！
+
+以下是一个参考结构，你可以根据实际内容选择使用哪些字段：
 {{
   "patient_info": {{
-    "patient_id": "患者ID",
     "name": "姓名",
     "gender": "性别",
     "age": "年龄",
-    "birthday": "生日",
-    "phone": "电话",
     "check_date": "检查日期",
     "hospital": "医院"
   }},
-  "chief_complaint": "主诉",
-  "present_illness": "现病史",
-  "symptoms": ["症状1", "症状2"],
   "vital_signs": {{
     "height_cm": 身高数值,
     "weight_kg": 体重数值,
     "bmi": BMI数值,
-    "temperature": "体温",
     "blood_pressure": "血压",
-    "pulse": "脉搏",
-    "respiration": "呼吸",
-    "spo2": "血氧饱和度"
+    "pulse": "脉搏"
   }},
-  "medical_history": {{
-    "past_history": ["既往病史1", "既往病史2"],
-    "family_history": ["家族史1", "家族史2"],
-    "allergy_history": ["过敏史1", "过敏史2"],
-    "medications": ["用药1", "用药2"],
-    "vaccination": ["疫苗接种1", "疫苗接种2"],
-    "surgery_history": ["手术史1", "手术史2"],
-    "smoking": "吸烟情况",
-    "drinking": "饮酒情况"
-  }},
-  "physical_examination": [
-    {{
-      "system": "系统名称",
-      "finding": "检查发现",
-      "normal": true/false
-    }}
-  ],
   "laboratory": [
     {{
-      "item": "检验项目编码",
       "name": "检验项目名称",
       "value": "结果值",
-      "raw_value": "原始值",
       "unit": "单位",
       "reference": "参考范围",
-      "flag": "异常标识（H/L/N）",
-      "valid": true/false
+      "flag": "异常标识（H/L/N）"
     }}
   ],
-  "urine_test": {{
-    "protein": "尿蛋白",
-    "glucose": "尿糖",
-    "occult_blood": "尿潜血",
-    "ketone": "尿酮体",
-    "leukocyte": "尿白细胞"
-  }},
-  "imaging": [
-    {{
-      "type": "检查类型",
-      "finding": "影像表现",
-      "conclusion": "影像结论"
-    }}
-  ],
-  "ecg": {{
-    "finding": "心电图表现",
-    "conclusion": "心电图结论"
-  }},
-  "diagnosis": {{
-    "clinical_diagnosis": ["诊断1", "诊断2"],
-    "doctor_conclusion": "医生结论"
-  }},
-  "clinical_features": ["临床特征1", "临床特征2"],
-  "kg_query": {{
-    "symptoms": ["症状1", "症状2"],
-    "laboratory_abnormal": ["异常指标1", "异常指标2"],
-    "risk_factors": ["风险因素1", "风险因素2"]
-  }},
   "summary": {{
     "health_conclusion": "健康总结",
     "recommendation": ["建议1", "建议2"]
   }}
 }}
-
-重要要求：
-1. 只抽取报告中真实存在的信息，不存在的字段设置为 null 或空数组 []
-2. 不要编造数据
-3. 保持医学语义准确
-4. 数值不修改，单位不修改
-5. 只输出JSON，不输出任何其他解释文字！
 
 体检报告文本：
 {text}
@@ -189,71 +142,53 @@ class AIService:
             if json_start != -1 and json_end != -1:
                 json_str = content[json_start:json_end + 1]
             result = json.loads(json_str)
-            return self._ensure_result_structure(result)
+            # 移除所有值为 null 或空数组的字段
+            result = self._clean_empty_fields(result)
+            return result
         except Exception as e:
             logger.error(f"JSON解析错误: {e}", exc_info=True)
             return {"raw_response": content}
 
-    def _ensure_result_structure(self, result: Dict[str, Any]) -> Dict[str, Any]:
-        """确保返回的结果包含所有必需的顶层字段"""
-        base_structure = {
-            "patient_info": None,
-            "chief_complaint": None,
-            "present_illness": None,
-            "symptoms": [],
-            "vital_signs": None,
-            "medical_history": None,
-            "physical_examination": [],
-            "laboratory": [],
-            "urine_test": None,
-            "imaging": [],
-            "ecg": None,
-            "diagnosis": None,
-            "clinical_features": [],
-            "kg_query": None,
-            "summary": None
-        }
-        
-        # 合并用户结果到基础结构中
-        for key, value in result.items():
-            if key in base_structure or key == "ocr":
-                base_structure[key] = value
-        
-        return base_structure
-
-    def _get_empty_result(self, text: str) -> Dict[str, Any]:
-        """返回空结果结构"""
-        return {
-            "patient_info": None,
-            "chief_complaint": None,
-            "present_illness": None,
-            "symptoms": [],
-            "vital_signs": None,
-            "medical_history": None,
-            "physical_examination": [],
-            "laboratory": [],
-            "urine_test": None,
-            "imaging": [],
-            "ecg": None,
-            "diagnosis": None,
-            "clinical_features": [],
-            "kg_query": None,
-            "summary": None,
-            "ocr": {
-                "source": "local",
-                "file_type": None,
-                "text_extracted": len(text) > 0,
-                "text_length": len(text),
-                "parse_confidence": None,
-                "raw_text": text[:1000]
-            }
-        }
+    def _clean_empty_fields(self, data: Any) -> Any:
+        """递归移除空值字段"""
+        if isinstance(data, dict):
+            cleaned = {}
+            for key, value in data.items():
+                cleaned_value = self._clean_empty_fields(value)
+                # 只保留非 null 和非空数组/对象的值
+                if cleaned_value is not None:
+                    if isinstance(cleaned_value, (list, dict)):
+                        if len(cleaned_value) > 0:
+                            cleaned[key] = cleaned_value
+                    else:
+                        cleaned[key] = cleaned_value
+            return cleaned
+        elif isinstance(data, list):
+            cleaned = []
+            for item in data:
+                cleaned_item = self._clean_empty_fields(item)
+                if cleaned_item is not None:
+                    if isinstance(cleaned_item, (list, dict)):
+                        if len(cleaned_item) > 0:
+                            cleaned.append(cleaned_item)
+                    else:
+                        cleaned.append(cleaned_item)
+            return cleaned if cleaned else None
+        else:
+            return data
 
     def _mock_parse(self, text: str, user_question: Optional[str] = None) -> Dict[str, Any]:
         logger.info(f"开始本地规则解析，文本长度: {len(text)}")
         
-        result = self._get_empty_result(text)
-        result["ocr"]["source"] = "local_rule_parser"
+        result = {}
+        # 始终添加 ocr 信息
+        if text:
+            result["ocr"] = {
+                "source": "local_rule_parser",
+                "text_extracted": True,
+                "text_length": len(text),
+                "raw_text": text[:1000]
+            }
         
         patient_info = {}
         vital_signs = {}
@@ -314,38 +249,32 @@ class AIService:
             
             # 简单的实验室指标提取
             lab_patterns = [
-                (r'(?:空腹)?(?:血糖|Glucose)[：:\s]*(\d+(?:\.\d+)?)\s*(?:mmol/L|mg/dL)?', "空腹血糖", "血糖", "mmol/L"),
-                (r'(?:总胆固醇|Cholesterol|TC)[：:\s]*(\d+(?:\.\d+)?)\s*(?:mmol/L)?', "总胆固醇", "CHOL", "mmol/L"),
-                (r'(?:甘油三酯|Triglyceride|TG)[：:\s]*(\d+(?:\.\d+)?)\s*(?:mmol/L)?', "甘油三酯", "TG", "mmol/L"),
-                (r'(?:血红蛋白|Hb|HGB)[：:\s]*(\d{2,3})\s*(?:g/L)?', "血红蛋白", "HGB", "g/L"),
-                (r'(?:白细胞|WBC)[：:\s]*(\d+(?:\.\d+)?)\s*(?:\*10\^9/L|×10⁹/L)?', "白细胞计数", "WBC", "×10⁹/L"),
-                (r'(?:红细胞|RBC)[：:\s]*(\d+(?:\.\d+)?)\s*(?:\*10\^12/L|×10¹²/L)?', "红细胞计数", "RBC", "×10¹²/L"),
-                (r'(?:血小板|PLT)[：:\s]*(\d{2,3})\s*(?:\*10\^9/L|×10⁹/L)?', "血小板计数", "PLT", "×10⁹/L")
+                (r'(?:空腹)?(?:血糖|Glucose)[：:\s]*(\d+(?:\.\d+)?)\s*(?:mmol/L|mg/dL)?', "空腹血糖", "mmol/L"),
+                (r'(?:总胆固醇|Cholesterol|TC)[：:\s]*(\d+(?:\.\d+)?)\s*(?:mmol/L)?', "总胆固醇", "mmol/L"),
+                (r'(?:甘油三酯|Triglyceride|TG)[：:\s]*(\d+(?:\.\d+)?)\s*(?:mmol/L)?', "甘油三酯", "mmol/L"),
+                (r'(?:血红蛋白|Hb|HGB)[：:\s]*(\d{2,3})\s*(?:g/L)?', "血红蛋白", "g/L"),
+                (r'(?:白细胞|WBC)[：:\s]*(\d+(?:\.\d+)?)\s*(?:\*10\^9/L|×10⁹/L)?', "白细胞计数", "×10⁹/L"),
+                (r'(?:红细胞|RBC)[：:\s]*(\d+(?:\.\d+)?)\s*(?:\*10\^12/L|×10¹²/L)?', "红细胞计数", "×10¹²/L"),
+                (r'(?:血小板|PLT)[：:\s]*(\d{2,3})\s*(?:\*10\^9/L|×10⁹/L)?', "血小板计数", "×10⁹/L")
             ]
             
-            for pattern, name, item, unit in lab_patterns:
+            for pattern, name, unit in lab_patterns:
                 match = re.search(pattern, clean_text, re.IGNORECASE)
                 if match:
                     laboratory.append({
-                        "item": item,
                         "name": name,
                         "value": match.group(1),
-                        "raw_value": match.group(1),
-                        "unit": unit,
-                        "reference": None,
-                        "flag": None,
-                        "valid": True
+                        "unit": unit
                     })
             
             # 体检结论
             conclusion_match = re.search(r'(?:体检)?(?:结论|Summary|Conclusion)[：:\s]*(.+?)(?=\s{2,}|\Z)', clean_text, re.DOTALL)
             if conclusion_match:
                 result["summary"] = {
-                    "health_conclusion": conclusion_match.group(1).strip(),
-                    "recommendation": []
+                    "health_conclusion": conclusion_match.group(1).strip()
                 }
         
-        # 更新结果
+        # 更新结果，只添加有内容的字段
         if patient_info:
             result["patient_info"] = patient_info
         

@@ -1,4 +1,5 @@
 import json
+import httpx
 from pathlib import Path
 from fastapi import APIRouter, Depends, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,6 +27,28 @@ pdf_service = PDFService(ocr_service)
 text_clean_service = TextCleanService()
 ai_service = AIService()
 parser_service = ParserService(ocr_service, pdf_service, text_clean_service, ai_service)
+
+
+async def call_report_generation_api(parsed_data: dict) -> dict:
+    """调用外部报告生成 API"""
+    if not settings.REPORT_GENERATION_API_URL:
+        logger.warning("REPORT_GENERATION_API_URL 未配置")
+        return None
+    
+    try:
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            response = await client.post(
+                settings.REPORT_GENERATION_API_URL,
+                json=parsed_data,
+                headers={"Content-Type": "application/json"}
+            )
+            response.raise_for_status()
+            result = response.json()
+            logger.info(f"报告生成 API 调用成功")
+            return result
+    except Exception as e:
+        logger.error(f"报告生成 API 调用失败: {e}", exc_info=True)
+        return None
 
 
 @router.post("/chat")
@@ -110,11 +133,19 @@ async def chat(
             if extracted_text and "extracted_text" not in parsed_json:
                 parsed_json["extracted_text"] = extracted_text[:1000]
 
-        json_str = json.dumps(parsed_json, ensure_ascii=False)
-
+        # 调用外部报告生成 API - 传入完整的识别结果
         assistant_msg = "已解析完成，查看下方JSON结果"
-        if "question" in parsed_json and parsed_json["question"]:
-            assistant_msg = f"已处理您的问题: {parsed_json['question']}"
+        report_api_result = None
+        
+        if parsed_json:
+            report_api_result = await call_report_generation_api(parsed_json)
+            if report_api_result and report_api_result.get("status") == "done":
+                report_text = report_api_result.get("report_text", "")
+                if report_text:
+                    assistant_msg = report_text
+                    logger.info("使用外部 API 生成的报告文本")
+        
+        json_str = json.dumps(parsed_json, ensure_ascii=False)
 
         assistant_message = await conv_service.add_message(
             conv.id,

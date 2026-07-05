@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     LLM_API_BASE: str = os.getenv("LLM_API_BASE", "https://dashscope.aliyuncs.com/compatible-mode/v1")
     LLM_MODEL: str = os.getenv("LLM_MODEL", "qwen-plus")  # 可以使用 qwen-turbo, qwen-plus, qwen-max 等
     
+    # 外部报告生成 API 配置
+    REPORT_GENERATION_API_URL: str = os.getenv("REPORT_GENERATION_API_URL", "http://10.187.79.121:8000/api/v1/reports/from-ocr-json/simple")
+    
     UPLOAD_DIR: Path = BASE_DIR / "uploads"
     
     class Config:
