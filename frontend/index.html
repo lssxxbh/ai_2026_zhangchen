@@ -235,13 +235,14 @@
       content: "MEDICAL AI";
       position: absolute;
       left: 32px;
-      bottom: 70px;
+      bottom: 72px;
       color: rgba(17, 20, 95, 0.055);
       font-size: clamp(76px, 12vw, 165px);
       font-weight: 900;
       letter-spacing: -0.08em;
       white-space: nowrap;
       pointer-events: none;
+      z-index: 0;
     }
 
     .stage-left {
@@ -249,6 +250,7 @@
       padding: 34px;
       overflow: hidden;
       min-height: 660px;
+      min-width: 0;
     }
 
     .auth-brand {
@@ -260,6 +262,7 @@
       font-weight: 900;
       letter-spacing: -0.04em;
       color: var(--red);
+      white-space: nowrap;
     }
 
     .auth-brand span {
@@ -268,7 +271,7 @@
 
     .mag-menu {
       position: absolute;
-      left: 205px;
+      left: 182px;
       top: 42px;
       z-index: 10;
       display: grid;
@@ -292,13 +295,20 @@
       margin-left: 11px;
     }
 
+    /* =========================================================
+       登录首页修正版：
+       1. 删除 Heart Health 卡片
+       2. 标题和说明整体左移
+       3. 说明文字不再绕卡片
+       ========================================================= */
+
     .stage-article {
       position: relative;
       z-index: 4;
       width: min(560px, 82%);
-      margin-top: 86px;
-      margin-left: 210px;
-      padding-right: 20px;
+      margin-top: 92px;
+      margin-left: 86px;
+      padding-right: 0;
     }
 
     .stage-article .kicker {
@@ -312,115 +322,61 @@
 
     .stage-article h1 {
       color: var(--red);
-      font-size: clamp(34px, 4.2vw, 58px);
-      line-height: 0.96;
-      letter-spacing: -0.065em;
+      font-size: clamp(38px, 4.7vw, 60px);
+      line-height: 1.03;
+      letter-spacing: -0.055em;
       font-weight: 900;
-      max-width: 520px;
+      max-width: 560px;
     }
 
     .stage-article p {
-      margin-top: 128px;
+      margin-top: 34px;
       color: var(--blue);
       font-size: 14px;
-      line-height: 1.8;
-      font-weight: 700;
-      max-width: 520px;
+      line-height: 1.9;
+      font-weight: 800;
+      max-width: 560px;
     }
 
     .topic-list {
       position: absolute;
-      right: 62px;
-      top: 112px;
+      right: 48px;
+      top: 118px;
       z-index: 6;
       list-style: none;
       color: var(--ink);
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.07em;
       font-weight: 900;
       text-align: right;
       pointer-events: none;
+      opacity: 0.62;
     }
 
     .topic-list li {
-      margin: 28px 0;
+      margin: 26px 0;
     }
 
     .topic-list li:nth-child(2) {
-      margin-bottom: 238px;
+      margin-bottom: 132px;
     }
 
+    /* 已删除中间橙色卡片。这里保留选择器，避免 JS 动画报错 */
     .centerbox {
-      position: absolute;
-      left: 180px;
-      top: 242px;
-      width: min(420px, 52%);
-      min-height: 174px;
-      padding: 28px;
-      background: linear-gradient(135deg, rgba(217,53,31,0.88), rgba(245,139,78,0.88));
-      color: #fff;
-      border-radius: 0 32px 32px 0;
-      transition: 0.75s var(--ease);
-      box-shadow: 0 24px 48px -24px rgba(217,53,31,0.55);
-      z-index: 5;
-      overflow: hidden;
-      backdrop-filter: blur(8px);
-    }
-
-    .centerbox::before {
-      content: "";
-      position: absolute;
-      width: 260px;
-      height: 260px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.16);
-      right: -100px;
-      top: -100px;
-    }
-
-    .centerbox .big-icon {
-      position: absolute;
-      left: -22px;
-      top: -42px;
-      font-size: 142px;
-      opacity: 0.18;
-      transform: rotate(-12deg);
-    }
-
-    .centerbox .text {
-      position: relative;
-      z-index: 2;
-      width: 58%;
-      margin-left: auto;
-    }
-
-    .centerbox .title {
-      font-size: 38px;
-      line-height: 0.95;
-      font-weight: 900;
-      letter-spacing: -0.055em;
-    }
-
-    .centerbox .articles {
-      margin-top: 12px;
-      font-size: 11px;
-      opacity: 0.78;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      display: none !important;
     }
 
     .bottom-links {
       position: absolute;
-      left: 25%;
+      left: 14%;
       right: 0;
       bottom: 0;
       z-index: 8;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-      padding: 26px 34px;
+      gap: 14px;
+      padding: 24px 30px;
       background: rgba(245,239,226,0.9);
       backdrop-filter: blur(14px);
       border-top: 1px solid rgba(20,20,22,0.08);
@@ -433,14 +389,14 @@
 
     .mini-link strong {
       display: block;
-      font-size: 13px;
+      font-size: 12px;
       margin-bottom: 7px;
       line-height: 1.35;
     }
 
     .mini-link span {
       color: var(--mute);
-      font-size: 11px;
+      font-size: 10px;
     }
 
     .auth-panel {
@@ -1324,25 +1280,99 @@
       font-weight: 900;
     }
 
-    @media (max-width: 1180px) {
+    @media (max-width: 1080px) {
+      .auth-shell {
+        padding: 28px;
+      }
+
       .auth-stage {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr) 330px;
+        min-height: 640px;
+      }
+
+      .stage-left {
+        min-height: 640px;
+        padding: 30px;
       }
 
       .auth-panel {
-        border-left: none;
-        border-top: 1px solid rgba(20,20,22,0.08);
+        padding: 30px;
+      }
+
+      .auth-title {
+        font-size: 32px;
+      }
+
+      .auth-sub {
+        font-size: 13px;
+        line-height: 1.7;
       }
 
       .stage-article {
-        margin-left: 120px;
+        margin-left: 64px;
+        width: min(520px, 86%);
+        margin-top: 94px;
       }
 
-      .centerbox {
-        left: 110px;
-        width: 58%;
+      .stage-article h1 {
+        font-size: clamp(34px, 5vw, 52px);
+        line-height: 1.05;
+        letter-spacing: -0.045em;
+        max-width: 520px;
       }
 
+      .stage-article p {
+        margin-top: 30px;
+        font-size: 13px;
+        line-height: 1.85;
+        max-width: 500px;
+      }
+
+      .topic-list {
+        display: none;
+      }
+
+      .bottom-links {
+        left: 8%;
+        padding: 22px 26px;
+        gap: 14px;
+      }
+
+      .mini-link strong {
+        font-size: 12px;
+      }
+
+      .mini-link span {
+        font-size: 10px;
+      }
+
+      .mag-menu {
+        left: 182px;
+      }
+    }
+
+    @media (max-width: 1180px) and (min-width: 1081px) {
+      .auth-stage {
+        grid-template-columns: minmax(0, 1fr) 350px;
+      }
+
+      .auth-panel {
+        border-left: 1px solid rgba(20,20,22,0.08);
+        border-top: none;
+      }
+
+      .stage-article {
+        margin-left: 72px;
+        width: min(560px, 84%);
+      }
+
+      .topic-list {
+        right: 28px;
+        opacity: 0.52;
+      }
+    }
+
+    @media (max-width: 1180px) {
       .top-nav {
         border-radius: 28px;
         align-items: flex-start;
@@ -1373,6 +1403,44 @@
       }
     }
 
+    @media (max-width: 920px) {
+      .auth-shell {
+        padding: 24px;
+        align-items: start;
+      }
+
+      .auth-stage {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .stage-left {
+        min-height: 560px;
+      }
+
+      .auth-panel {
+        border-left: none;
+        border-top: 1px solid rgba(20,20,22,0.08);
+      }
+
+      .stage-article {
+        margin-left: 48px;
+        width: min(560px, 88%);
+      }
+
+      .stage-article h1 {
+        max-width: 560px;
+      }
+
+      .stage-article p {
+        max-width: 540px;
+      }
+
+      .bottom-links {
+        left: 0;
+      }
+    }
+
     @media (max-width: 760px) {
       .auth-shell,
       .app {
@@ -1384,31 +1452,51 @@
       }
 
       .stage-left {
-        min-height: 540px;
+        min-height: 430px;
         padding: 24px;
       }
 
+      .mag-menu {
+        right: 24px;
+        left: auto;
+        top: 32px;
+      }
+
       .topic-list,
-      .bottom-links,
-      .stage-article {
+      .bottom-links {
         display: none;
       }
 
-      .centerbox {
-        left: 24px;
-        right: 24px;
-        top: 210px;
-        width: auto;
-        border-radius: 28px;
+      .stage-article {
+        display: block;
+        margin-left: 0;
+        margin-top: 86px;
+        width: 100%;
       }
 
-      .centerbox .text {
-        width: 100%;
-        margin-left: 0;
+      .stage-article .kicker {
+        font-size: 11px;
+        margin-bottom: 14px;
+      }
+
+      .stage-article h1 {
+        font-size: clamp(34px, 11vw, 48px);
+        line-height: 1.08;
+        max-width: 100%;
+      }
+
+      .stage-article p {
+        margin-top: 24px;
+        font-size: 13px;
+        max-width: 100%;
       }
 
       .auth-panel {
         padding: 24px;
+      }
+
+      .auth-title {
+        font-size: 34px;
       }
 
       .nav-menu {
@@ -1464,6 +1552,46 @@
         overflow-x: auto;
       }
     }
+
+    @media (max-width: 430px) {
+      .auth-brand {
+        font-size: 13px;
+        gap: 8px;
+      }
+
+      .logo-dot {
+        width: 18px;
+        height: 18px;
+      }
+
+      .mag-menu {
+        display: none;
+      }
+
+      .stage-left {
+        min-height: 420px;
+      }
+
+      .stage-article {
+        margin-top: 72px;
+      }
+
+      .stage-article h1 {
+        font-size: 34px;
+      }
+
+      .auth-tabs {
+        margin-bottom: 26px;
+      }
+
+      .auth-title {
+        font-size: 31px;
+      }
+
+      .auth-sub {
+        font-size: 13px;
+      }
+    }
   </style>
 </head>
 
@@ -1493,19 +1621,15 @@
 
         <article class="stage-article">
           <div class="kicker">Article of the day</div>
-          <h1>让体检报告从“看不懂”变成“能追溯、可解释”。</h1>
+          <h1>
+            让体检报告从<br />
+            “看不懂”变成<br />
+            “可追溯、可解释”
+          </h1>
           <p>
             系统覆盖图片 / PDF 报告识别、医学实体抽取、知识增强检索、多专科 Agent 协同推理与综合健康建议生成。
           </p>
         </article>
-
-        <div class="centerbox">
-          <div class="big-icon">♥</div>
-          <div class="text">
-            <div class="title">Heart<br />Health</div>
-            <div class="articles">Medical Report Intelligence</div>
-          </div>
-        </div>
 
         <div class="bottom-links">
           <div class="mini-link">
@@ -3181,14 +3305,6 @@
           scale: 0.97,
           duration: 0.85,
           ease: "power3.out"
-        });
-
-        gsap.from(".centerbox", {
-          x: -70,
-          opacity: 0,
-          duration: 0.8,
-          delay: 0.2,
-          ease: "back.out(1.2)"
         });
 
         gsap.from(".stage-article h1, .stage-article p, .topic-list li, .mini-link", {
