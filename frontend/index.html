@@ -1,0 +1,3209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>多模态医疗报告智能解读与多 Agent 辅助诊断系统</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..900;1,9..40,400..900&family=Noto+Serif+SC:wght@500;600;700;900&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #f5efe2;
+      --paper: #fffaf0;
+      --paper-2: #f8f0df;
+      --ink: #141416;
+      --ink-soft: #2b2b30;
+      --mute: #8b847a;
+      --line: #ded4c0;
+      --ghost: #c7bfab;
+      --blue: #11145f;
+      --red: #d9351f;
+      --orange: #e85a2b;
+      --orange-2: #f58b4e;
+      --orange-3: #fdc68a;
+      --green: #66753d;
+      --danger: #b73322;
+      --shadow: 0 34px 80px -32px rgba(20, 8, 0, 0.42);
+      --radius-xl: 38px;
+      --radius-lg: 26px;
+      --radius-md: 18px;
+      --ease: cubic-bezier(0.5, 0.005, 0.075, 0.985);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "DM Sans", "Noto Serif SC", system-ui, sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background:
+        radial-gradient(120% 70% at 50% 0%, #f9f4e9 0%, #f2ead6 58%, #e8dcc0 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 300;
+      opacity: 0.055;
+      mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.11  0 0 0 0 0.09  0 0 0 0.62 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font-family: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .logo-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--red), var(--orange-3));
+      box-shadow:
+        0 6px 12px -4px rgba(217, 53, 31, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45),
+        inset 0 -3px 5px rgba(100, 20, 0, 0.34);
+      flex: 0 0 auto;
+    }
+
+    .primary-btn,
+    .ghost-btn,
+    .dark-btn {
+      border: none;
+      border-radius: 999px;
+      font-weight: 900;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      transition: 0.35s var(--ease);
+    }
+
+    .primary-btn {
+      padding: 14px 24px;
+      color: #fffaf2;
+      background: linear-gradient(135deg, var(--red), var(--orange-2));
+      box-shadow:
+        0 18px 34px -16px rgba(217, 53, 31, 0.75),
+        inset 0 1px 0 rgba(255,255,255,0.25),
+        inset 0 -3px 8px rgba(110, 18, 0, 0.28);
+    }
+
+    .primary-btn:hover,
+    .ghost-btn:hover,
+    .dark-btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .dark-btn {
+      padding: 13px 22px;
+      background: var(--ink);
+      color: #fffaf2;
+      box-shadow: 0 16px 26px -14px rgba(0,0,0,0.5);
+    }
+
+    .ghost-btn {
+      padding: 12px 18px;
+      background: rgba(255,255,255,0.58);
+      color: var(--ink);
+      border: 1px solid rgba(20,20,22,0.12);
+    }
+
+    .field label {
+      display: block;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 9px;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      border: 1px solid rgba(20,20,22,0.12);
+      background: rgba(255,255,255,0.72);
+      border-radius: 18px;
+      outline: none;
+      padding: 15px 16px;
+      color: var(--ink);
+      transition: 0.25s var(--ease);
+      font-size: 14px;
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 82px;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      border-color: rgba(217, 53, 31, 0.55);
+      background: rgba(255,255,255,0.94);
+      box-shadow: 0 0 0 5px rgba(217, 53, 31, 0.09);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--mute);
+      font-size: 11px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--red);
+      box-shadow: 0 0 0 4px rgba(217, 53, 31, 0.14);
+    }
+
+    .auth-shell {
+      min-height: 100vh;
+      position: relative;
+      display: grid;
+      place-items: center;
+      padding: 42px;
+      overflow: hidden;
+    }
+
+    .auth-bg-block {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 74vh;
+      background:
+        radial-gradient(circle at 80% 20%, rgba(232,90,43,0.35), transparent 30%),
+        linear-gradient(135deg, #11145f, #181b72);
+      z-index: 0;
+    }
+
+    .auth-stage {
+      position: relative;
+      z-index: 1;
+      width: min(1120px, 100%);
+      min-height: 660px;
+      background: var(--bg);
+      border-radius: 34px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.36);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+    }
+
+    .auth-stage::after {
+      content: "MEDICAL AI";
+      position: absolute;
+      left: 32px;
+      bottom: 70px;
+      color: rgba(17, 20, 95, 0.055);
+      font-size: clamp(76px, 12vw, 165px);
+      font-weight: 900;
+      letter-spacing: -0.08em;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .stage-left {
+      position: relative;
+      padding: 34px;
+      overflow: hidden;
+      min-height: 660px;
+    }
+
+    .auth-brand {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: var(--red);
+    }
+
+    .auth-brand span {
+      color: var(--blue);
+    }
+
+    .mag-menu {
+      position: absolute;
+      left: 205px;
+      top: 42px;
+      z-index: 10;
+      display: grid;
+      gap: 4px;
+    }
+
+    .mag-menu i {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--red);
+      border-radius: 99px;
+    }
+
+    .mag-menu i:nth-child(1) {
+      width: 15px;
+    }
+
+    .mag-menu i:nth-child(3) {
+      width: 13px;
+      margin-left: 11px;
+    }
+
+    .stage-article {
+      position: relative;
+      z-index: 4;
+      width: min(560px, 82%);
+      margin-top: 86px;
+      margin-left: 210px;
+      padding-right: 20px;
+    }
+
+    .stage-article .kicker {
+      color: var(--ghost);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 18px;
+    }
+
+    .stage-article h1 {
+      color: var(--red);
+      font-size: clamp(34px, 4.2vw, 58px);
+      line-height: 0.96;
+      letter-spacing: -0.065em;
+      font-weight: 900;
+      max-width: 520px;
+    }
+
+    .stage-article p {
+      margin-top: 128px;
+      color: var(--blue);
+      font-size: 14px;
+      line-height: 1.8;
+      font-weight: 700;
+      max-width: 520px;
+    }
+
+    .topic-list {
+      position: absolute;
+      right: 62px;
+      top: 112px;
+      z-index: 6;
+      list-style: none;
+      color: var(--ink);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 900;
+      text-align: right;
+      pointer-events: none;
+    }
+
+    .topic-list li {
+      margin: 28px 0;
+    }
+
+    .topic-list li:nth-child(2) {
+      margin-bottom: 238px;
+    }
+
+    .centerbox {
+      position: absolute;
+      left: 180px;
+      top: 242px;
+      width: min(420px, 52%);
+      min-height: 174px;
+      padding: 28px;
+      background: linear-gradient(135deg, rgba(217,53,31,0.88), rgba(245,139,78,0.88));
+      color: #fff;
+      border-radius: 0 32px 32px 0;
+      transition: 0.75s var(--ease);
+      box-shadow: 0 24px 48px -24px rgba(217,53,31,0.55);
+      z-index: 5;
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+    }
+
+    .centerbox::before {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.16);
+      right: -100px;
+      top: -100px;
+    }
+
+    .centerbox .big-icon {
+      position: absolute;
+      left: -22px;
+      top: -42px;
+      font-size: 142px;
+      opacity: 0.18;
+      transform: rotate(-12deg);
+    }
+
+    .centerbox .text {
+      position: relative;
+      z-index: 2;
+      width: 58%;
+      margin-left: auto;
+    }
+
+    .centerbox .title {
+      font-size: 38px;
+      line-height: 0.95;
+      font-weight: 900;
+      letter-spacing: -0.055em;
+    }
+
+    .centerbox .articles {
+      margin-top: 12px;
+      font-size: 11px;
+      opacity: 0.78;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .bottom-links {
+      position: absolute;
+      left: 25%;
+      right: 0;
+      bottom: 0;
+      z-index: 8;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      padding: 26px 34px;
+      background: rgba(245,239,226,0.9);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(20,20,22,0.08);
+    }
+
+    .mini-link {
+      font-size: 12px;
+      color: var(--blue);
+    }
+
+    .mini-link strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 7px;
+      line-height: 1.35;
+    }
+
+    .mini-link span {
+      color: var(--mute);
+      font-size: 11px;
+    }
+
+    .auth-panel {
+      position: relative;
+      z-index: 12;
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(18px);
+      border-left: 1px solid rgba(20,20,22,0.08);
+      padding: 34px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: rgba(20,20,22,0.07);
+      border-radius: 999px;
+      padding: 6px;
+      margin-bottom: 34px;
+    }
+
+    .auth-tab {
+      border: none;
+      background: transparent;
+      border-radius: 999px;
+      padding: 12px 16px;
+      color: var(--mute);
+      font-weight: 900;
+      transition: 0.3s var(--ease);
+    }
+
+    .auth-tab.active {
+      color: #fff;
+      background: var(--ink);
+      box-shadow: 0 12px 20px -12px rgba(0,0,0,0.5);
+    }
+
+    .auth-title {
+      font-size: 36px;
+      line-height: 1;
+      letter-spacing: -0.06em;
+      margin-bottom: 14px;
+      color: var(--ink);
+      font-weight: 900;
+    }
+
+    .auth-title em {
+      font-style: italic;
+      color: var(--red);
+    }
+
+    .auth-sub {
+      color: var(--mute);
+      font-size: 14px;
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+
+    .form {
+      display: grid;
+      gap: 16px;
+    }
+
+    .login-msg {
+      min-height: 20px;
+      margin-top: 14px;
+      color: var(--red);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .app {
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 16px 20px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 999px;
+      background: rgba(245,239,226,0.82);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(20,20,22,0.08);
+      box-shadow: 0 16px 30px -26px rgba(0,0,0,0.36);
+      gap: 16px;
+    }
+
+    .app-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      letter-spacing: -0.035em;
+      white-space: nowrap;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      list-style: none;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .nav-item {
+      border-radius: 999px;
+      padding: 10px 14px;
+      color: var(--ink-soft);
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: 0.28s var(--ease);
+      border: 1px solid transparent;
+      user-select: none;
+    }
+
+    .nav-item:hover {
+      background: rgba(255,255,255,0.6);
+      transform: translateY(-2px);
+    }
+
+    .nav-item.active {
+      background: var(--ink);
+      color: #fffaf2;
+      box-shadow: 0 14px 24px -18px rgba(0,0,0,0.48);
+    }
+
+    .nav-item .num {
+      color: var(--orange-2);
+      margin-right: 5px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-pill {
+      padding: 11px 15px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.54);
+      color: var(--ink);
+      border: 1px solid rgba(20,20,22,0.08);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .app-main {
+      width: min(1480px, 100%);
+      margin: 0 auto;
+    }
+
+    .page {
+      display: none;
+      animation: pageIn 0.52s var(--ease) both;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes pageIn {
+      from {
+        opacity: 0;
+        transform: translateY(22px) scale(0.985);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .hero-dashboard {
+      position: relative;
+      min-height: 610px;
+      padding: 82px 34px 54px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+    }
+
+    .hero-dashboard::before {
+      content: "diagnosis";
+      position: absolute;
+      left: 50%;
+      top: 34%;
+      transform: translate(-50%, -50%);
+      color: var(--ghost);
+      font-size: clamp(96px, 17vw, 260px);
+      font-style: italic;
+      font-weight: 900;
+      letter-spacing: -0.075em;
+      line-height: 0.85;
+      white-space: nowrap;
+      opacity: 0.7;
+      z-index: 0;
+    }
+
+    .hero-title-top {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+      font-size: clamp(42px, 6.4vw, 94px);
+      line-height: 0.95;
+      font-weight: 900;
+      letter-spacing: -0.07em;
+      max-width: 1120px;
+    }
+
+    .hero-title-top em {
+      font-style: italic;
+      color: var(--red);
+    }
+
+    .hero-desc {
+      position: relative;
+      z-index: 4;
+      max-width: 780px;
+      margin: 38px auto 0;
+      text-align: center;
+      color: var(--ink-soft);
+      line-height: 1.9;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .hero-tags {
+      position: relative;
+      z-index: 4;
+      margin-top: 28px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.54);
+      border: 1px solid rgba(20,20,22,0.09);
+      color: var(--ink-soft);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 22px;
+    }
+
+    .section-title h3 {
+      color: var(--ink);
+      font-size: clamp(30px, 3vw, 48px);
+      line-height: 0.98;
+      letter-spacing: -0.06em;
+      font-weight: 900;
+    }
+
+    .section-title h3 em {
+      font-style: italic;
+      color: var(--red);
+    }
+
+    .section-title p {
+      max-width: 640px;
+      color: var(--mute);
+      font-size: 14px;
+      line-height: 1.75;
+      font-weight: 700;
+    }
+
+    .dashboard-grid,
+    .three-col {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .three-col {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+
+    .metric-card,
+    .content-card,
+    .report-card,
+    .agent-card,
+    .advice-item,
+    .chat-panel,
+    .history-panel,
+    .json-panel {
+      background: rgba(255,250,240,0.68);
+      border: 1px solid rgba(20,20,22,0.09);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 24px 48px -34px rgba(20,8,0,0.34);
+      backdrop-filter: blur(16px);
+    }
+
+    .metric-card,
+    .content-card,
+    .agent-card,
+    .advice-item {
+      padding: 24px;
+      transition: 0.35s var(--ease);
+    }
+
+    .metric-card:hover,
+    .content-card:hover,
+    .agent-card:hover,
+    .advice-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 32px 58px -34px rgba(217,53,31,0.38);
+    }
+
+    .metric-card .label {
+      color: var(--mute);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-weight: 900;
+      margin-bottom: 15px;
+    }
+
+    .metric-card .value {
+      color: var(--ink);
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -0.07em;
+    }
+
+    .metric-card .desc {
+      color: var(--ink-soft);
+      font-size: 13px;
+      line-height: 1.65;
+      margin-top: 10px;
+      font-weight: 700;
+    }
+
+    .team-table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.42);
+    }
+
+    .team-table th,
+    .team-table td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(20,20,22,0.08);
+      vertical-align: top;
+      font-size: 13px;
+      line-height: 1.75;
+    }
+
+    .team-table th {
+      color: var(--ink);
+      background: rgba(20,20,22,0.06);
+      font-weight: 900;
+    }
+
+    .team-table td {
+      color: var(--ink-soft);
+      font-weight: 700;
+    }
+
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1.25fr) minmax(360px, 0.9fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .history-panel,
+    .chat-panel,
+    .json-panel {
+      padding: 20px;
+      min-height: 680px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .panel-head h4 {
+      font-size: 19px;
+      letter-spacing: -0.04em;
+      font-weight: 900;
+    }
+
+    .conversation-list {
+      display: grid;
+      gap: 10px;
+      max-height: 470px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .conversation-item {
+      padding: 13px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.52);
+      border: 1px solid rgba(20,20,22,0.08);
+      cursor: pointer;
+      transition: 0.25s var(--ease);
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--ink-soft);
+    }
+
+    .conversation-item:hover,
+    .conversation-item.active {
+      background: var(--ink);
+      color: #fffaf2;
+      transform: translateX(4px);
+    }
+
+    .chat-window {
+      height: 410px;
+      overflow: auto;
+      padding: 16px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.42);
+      border: 1px solid rgba(20,20,22,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .msg {
+      max-width: 78%;
+      padding: 13px 15px;
+      border-radius: 18px;
+      line-height: 1.7;
+      font-size: 14px;
+      font-weight: 700;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .msg.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--red), var(--orange-2));
+      color: white;
+      border-bottom-right-radius: 6px;
+    }
+
+    .msg.assistant {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.78);
+      color: var(--ink-soft);
+      border: 1px solid rgba(20,20,22,0.08);
+      border-bottom-left-radius: 6px;
+    }
+
+    .upload-control {
+      margin-top: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .file-drop {
+      min-height: 112px;
+      border: 1.5px dashed rgba(217,53,31,0.34);
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(253,198,138,0.22), transparent 42%),
+        rgba(255,255,255,0.36);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 18px;
+    }
+
+    .file-drop strong {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+
+    .file-drop span {
+      font-size: 12px;
+      color: var(--mute);
+      font-weight: 700;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .send-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .json-code {
+      height: 580px;
+      overflow: auto;
+      border-radius: 20px;
+      padding: 16px;
+      background: #171717;
+      color: #f8f0df;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .data-grid {
+      margin-top: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .data-row {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr 0.8fr 0.7fr;
+      gap: 10px;
+      padding: 13px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.52);
+      border: 1px solid rgba(20,20,22,0.08);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .status-high {
+      color: var(--danger);
+      font-weight: 900;
+    }
+
+    .status-mid {
+      color: #b76a19;
+      font-weight: 900;
+    }
+
+    .status-low {
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .report-hero {
+      padding: 34px;
+      min-height: 280px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .report-hero::after {
+      content: "REPORT";
+      position: absolute;
+      right: -12px;
+      bottom: -18px;
+      color: rgba(20,20,22,0.045);
+      font-size: 150px;
+      font-weight: 900;
+      letter-spacing: -0.08em;
+    }
+
+    .risk-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 15px;
+      border-radius: 999px;
+      background: rgba(217,53,31,0.11);
+      color: var(--danger);
+      font-weight: 900;
+      font-size: 13px;
+      margin-bottom: 22px;
+    }
+
+    .report-hero h4 {
+      color: var(--ink);
+      font-size: 36px;
+      line-height: 1;
+      letter-spacing: -0.055em;
+      margin-bottom: 16px;
+      font-weight: 900;
+      position: relative;
+      z-index: 2;
+    }
+
+    .report-hero p,
+    .agent-card p,
+    .advice-item p {
+      color: var(--ink-soft);
+      line-height: 1.8;
+      font-size: 14px;
+      font-weight: 700;
+      position: relative;
+      z-index: 2;
+    }
+
+    .agent-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .agent-card::before {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border-radius: 999px;
+      background: rgba(232,90,43,0.12);
+      right: -70px;
+      top: -80px;
+    }
+
+    .agent-card h4 {
+      color: var(--ink);
+      font-size: 18px;
+      margin-bottom: 11px;
+      font-weight: 900;
+    }
+
+    .agent-card .confidence {
+      color: var(--red);
+      font-size: 42px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+      margin: 18px 0;
+    }
+
+    .report-empty {
+      padding: 60px 30px;
+      text-align: center;
+      color: var(--mute);
+      font-weight: 800;
+    }
+
+    .evidence-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .evidence-item {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.54);
+      border: 1px solid rgba(20,20,22,0.08);
+      font-size: 13px;
+      line-height: 1.75;
+      color: var(--ink-soft);
+      font-weight: 700;
+    }
+
+    .kg-shell {
+      width: min(1720px, 100%);
+      margin: 0 auto;
+    }
+
+    .kg-wrap {
+      position: relative;
+      height: 860px;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      background: #f2ead8;
+      border: 1px solid rgba(20,20,22,0.09);
+      box-shadow: 0 24px 48px -34px rgba(20,8,0,0.34);
+    }
+
+    .kg-wrap svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #f2ead8;
+    }
+
+    .kg-node {
+      cursor: grab;
+    }
+
+    .kg-node:active {
+      cursor: grabbing;
+    }
+
+    .kg-label {
+      font-family: "DM Sans", "Noto Serif SC", Arial, sans-serif;
+      user-select: none;
+      pointer-events: none;
+      fill: #24242a;
+      font-weight: 900;
+    }
+
+    .kg-link {
+      stroke: rgba(20,20,22,0.32);
+      stroke-width: 1.1;
+      fill: none;
+    }
+
+    .kg-panel {
+      position: absolute;
+      right: 24px;
+      top: 24px;
+      width: 330px;
+      padding: 20px;
+      border-radius: 24px;
+      background: rgba(255,250,240,0.9);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(20,20,22,0.09);
+      box-shadow: 0 18px 34px -24px rgba(0,0,0,0.32);
+      z-index: 5;
+    }
+
+    .kg-panel h4 {
+      color: var(--ink);
+      margin-bottom: 10px;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .kg-panel p {
+      color: var(--mute);
+      font-size: 13px;
+      line-height: 1.75;
+      font-weight: 700;
+    }
+
+    .kg-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .stats-panel {
+      margin-top: 22px;
+      background: var(--ink);
+      color: #fffaf2;
+      border-radius: var(--radius-xl);
+      padding: 48px;
+      display: grid;
+      grid-template-columns: 1.3fr repeat(3, 1fr);
+      gap: 28px;
+      align-items: end;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .stats-panel::before {
+      content: "";
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(232,90,43,0.36), transparent 65%);
+      right: -170px;
+      top: -230px;
+      filter: blur(18px);
+    }
+
+    .stats-panel h3 {
+      position: relative;
+      z-index: 1;
+      font-size: clamp(30px, 3vw, 48px);
+      line-height: 1.02;
+      letter-spacing: -0.06em;
+      font-weight: 900;
+    }
+
+    .stats-panel h3 em {
+      font-style: italic;
+      color: var(--orange-3);
+    }
+
+    .stat-block {
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-block .num {
+      font-size: clamp(44px, 4vw, 68px);
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+    }
+
+    .stat-block .lbl {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.14);
+      color: rgba(255,250,242,0.56);
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .bar-chart {
+      display: grid;
+      gap: 18px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 60px;
+      align-items: center;
+      gap: 16px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .bar-track {
+      height: 13px;
+      border-radius: 999px;
+      background: rgba(20,20,22,0.09);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--red), var(--orange-3));
+    }
+
+    .advice-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .advice-item h4 {
+      color: var(--ink);
+      margin-bottom: 10px;
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .advice-meta {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .advice-tag {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(217,53,31,0.09);
+      color: var(--red);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    @media (max-width: 1180px) {
+      .auth-stage {
+        grid-template-columns: 1fr;
+      }
+
+      .auth-panel {
+        border-left: none;
+        border-top: 1px solid rgba(20,20,22,0.08);
+      }
+
+      .stage-article {
+        margin-left: 120px;
+      }
+
+      .centerbox {
+        left: 110px;
+        width: 58%;
+      }
+
+      .top-nav {
+        border-radius: 28px;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .history-panel,
+      .chat-panel,
+      .json-panel {
+        min-height: auto;
+      }
+
+      .dashboard-grid,
+      .three-col {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-panel {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .auth-shell,
+      .app {
+        padding: 14px;
+      }
+
+      .auth-stage {
+        border-radius: 26px;
+      }
+
+      .stage-left {
+        min-height: 540px;
+        padding: 24px;
+      }
+
+      .topic-list,
+      .bottom-links,
+      .stage-article {
+        display: none;
+      }
+
+      .centerbox {
+        left: 24px;
+        right: 24px;
+        top: 210px;
+        width: auto;
+        border-radius: 28px;
+      }
+
+      .centerbox .text {
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .auth-panel {
+        padding: 24px;
+      }
+
+      .nav-menu {
+        justify-content: flex-start;
+      }
+
+      .user-pill {
+        display: none;
+      }
+
+      .dashboard-grid,
+      .three-col {
+        grid-template-columns: 1fr;
+      }
+
+      .section-title {
+        display: block;
+      }
+
+      .section-title p {
+        margin-top: 12px;
+      }
+
+      .send-row {
+        grid-template-columns: 1fr;
+      }
+
+      .data-row {
+        grid-template-columns: 1fr;
+      }
+
+      .bar-row {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-panel {
+        grid-template-columns: 1fr;
+        padding: 34px 24px;
+      }
+
+      .kg-wrap {
+        height: 700px;
+      }
+
+      .kg-panel {
+        position: static;
+        width: auto;
+        margin: 12px;
+      }
+
+      .team-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <section class="auth-shell" id="authShell">
+    <div class="auth-bg-block"></div>
+
+    <div class="auth-stage">
+      <div class="stage-left">
+        <div class="auth-brand">
+          <span class="logo-dot"></span>
+          THE <span>HEALTH AI</span>
+        </div>
+
+        <div class="mag-menu">
+          <i></i>
+          <i></i>
+          <i></i>
+        </div>
+
+        <ul class="topic-list">
+          <li>OCR Recognition</li>
+          <li>Knowledge Graph</li>
+          <li>Multi Agent</li>
+          <li>Risk Explainability</li>
+        </ul>
+
+        <article class="stage-article">
+          <div class="kicker">Article of the day</div>
+          <h1>让体检报告从“看不懂”变成“能追溯、可解释”。</h1>
+          <p>
+            系统覆盖图片 / PDF 报告识别、医学实体抽取、知识增强检索、多专科 Agent 协同推理与综合健康建议生成。
+          </p>
+        </article>
+
+        <div class="centerbox">
+          <div class="big-icon">♥</div>
+          <div class="text">
+            <div class="title">Heart<br />Health</div>
+            <div class="articles">Medical Report Intelligence</div>
+          </div>
+        </div>
+
+        <div class="bottom-links">
+          <div class="mini-link">
+            <strong>多模态报告识别</strong>
+            <span>PaddleOCR · PDF · Image</span>
+          </div>
+          <div class="mini-link">
+            <strong>知识图谱增强推理</strong>
+            <span>Four-layer Graph</span>
+          </div>
+          <div class="mini-link">
+            <strong>多 Agent 辅助诊断</strong>
+            <span>Critique Verification</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-panel">
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-auth-tab="login">登录</button>
+          <button class="auth-tab" data-auth-tab="register">注册</button>
+        </div>
+
+        <div id="loginForm">
+          <h2 class="auth-title">进入 <em>系统</em></h2>
+          <p class="auth-sub">登录后进入项目介绍页面，通过顶部栏目访问上传识别、报告可视化、知识图谱、数据统计和健康建议模块。</p>
+
+          <div class="form">
+            <div class="field">
+              <label>账号</label>
+              <input id="loginUsername" type="text" placeholder="请输入账号" value="superthursday" />
+            </div>
+
+            <div class="field">
+              <label>密码</label>
+              <input id="loginPassword" type="password" placeholder="请输入密码" value="123456" />
+            </div>
+
+            <button class="primary-btn" id="loginBtn">登录系统 <span>↗</span></button>
+            <div class="login-msg" id="loginMsg"></div>
+          </div>
+        </div>
+
+        <div id="registerForm" class="hidden">
+          <h2 class="auth-title">创建 <em>账号</em></h2>
+          <p class="auth-sub">注册后会自动进入系统，并创建可用于历史会话管理的登录状态。</p>
+
+          <div class="form">
+            <div class="field">
+              <label>账号</label>
+              <input id="regUsername" type="text" placeholder="设置登录账号" />
+            </div>
+
+            <div class="field">
+              <label>密码</label>
+              <input id="regPassword" type="password" placeholder="设置登录密码" />
+            </div>
+
+            <button class="primary-btn" id="registerBtn">注册并进入 <span>↗</span></button>
+            <div class="login-msg" id="regMsg"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="app hidden" id="appShell">
+    <nav class="top-nav">
+      <div class="app-logo">
+        <span class="logo-dot"></span>
+        超级星期四 · 医疗报告智能解读
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item active" data-page="intro"><span class="num">00</span>项目介绍</li>
+        <li class="nav-item" data-page="upload"><span class="num">01</span>上传识别</li>
+        <li class="nav-item" data-page="report"><span class="num">02</span>报告可视化</li>
+        <li class="nav-item" data-page="kg"><span class="num">03</span>知识图谱</li>
+        <li class="nav-item" data-page="stats"><span class="num">04</span>数据统计</li>
+        <li class="nav-item" data-page="advice"><span class="num">05</span>健康建议</li>
+      </ul>
+
+      <div class="top-actions">
+        <div class="user-pill" id="userPill">组名：超级星期四</div>
+        <button class="ghost-btn" id="logoutBtn">退出</button>
+      </div>
+    </nav>
+
+    <main class="app-main">
+      <section class="page active" id="page-intro">
+        <div class="hero-dashboard">
+          <div class="eyebrow">Multimodal Medical Report Intelligence</div>
+          <h1 class="hero-title-top">
+            多模态医疗报告<br />
+            <em>智能解读系统</em>
+          </h1>
+
+          <p class="hero-desc">
+            体检报告包含大量结构化检验指标与非结构化诊断描述。本项目构建面向图片与 PDF 体检报告的智能解读系统，通过 OCR、医学实体识别、向量检索、知识图谱、多 Agent 协作与 Critique 校验生成可追溯的综合诊断报告。
+          </p>
+
+          <div class="hero-tags">
+            <span class="tag">PaddleOCR</span>
+            <span class="tag">FAISS 检索</span>
+            <span class="tag">四层知识图谱</span>
+            <span class="tag">多 Agent 协作</span>
+            <span class="tag">Critique 校验</span>
+            <span class="tag">FastAPI API</span>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="metric-card">
+            <div class="label">核心链路</div>
+            <div class="value">5</div>
+            <div class="desc">感知、理解、检索、推理、生成。</div>
+          </div>
+          <div class="metric-card">
+            <div class="label">专科 Agent</div>
+            <div class="value">3</div>
+            <div class="desc">心血管、肝脏、内分泌并行分析。</div>
+          </div>
+          <div class="metric-card">
+            <div class="label">历史会话</div>
+            <div class="value" id="conversationCount">0</div>
+            <div class="desc">自动同步后端会话记录。</div>
+          </div>
+          <div class="metric-card">
+            <div class="label">当前状态</div>
+            <div class="value" style="font-size: 28px;" id="apiStatus">Ready</div>
+            <div class="desc">可接入 FastAPI 服务。</div>
+          </div>
+        </div>
+
+        <div class="content-card" style="margin-top: 22px;">
+          <div class="section-title">
+            <h3>成员 <em>分工</em></h3>
+            <p>以下为团队成员与职责划分。</p>
+          </div>
+
+          <table class="team-table">
+            <thead>
+              <tr>
+                <th>成员</th>
+                <th>方向</th>
+                <th>分工</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>周子烨</td>
+                <td>AI 方向</td>
+                <td>负责 RAG 检索引擎模块，实现医学实体识别、Embedding 替换、FAISS 索引构建与相似病例检索。</td>
+              </tr>
+              <tr>
+                <td>赵雪柔</td>
+                <td>AI 方向</td>
+                <td>负责知识图谱与多 Agent 模块，构建四层层次化疾病知识图谱，开发三专科 Agent 与 Critique 校验引擎。</td>
+              </tr>
+              <tr>
+                <td>崔圣宇</td>
+                <td>软件与后端方向</td>
+                <td>负责 FastAPI 后端骨架、核心 API、异步任务状态机、Redis 缓存、文件与报告服务、Docker 部署。</td>
+              </tr>
+              <tr>
+                <td>任少扬</td>
+                <td>前端与多模态方向</td>
+                <td>负责 PaddleOCR 图片 / PDF 识别、表格结构化解析、前端界面与交互组件优化。</td>
+              </tr>
+              <tr>
+                <td>牛翔</td>
+                <td>软件与 AI 方向</td>
+                <td>负责 LLM 统一调用网关、Baseline 脚本、评估指标体系、消融实验与全链路联调文档。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="page" id="page-upload">
+        <div class="section-title">
+          <h3>上传和 <em>识别</em></h3>
+          <p>支持对话、文件上传、历史会话、JSON 解析结果、结构化指标表。</p>
+        </div>
+
+        <div class="workspace-grid">
+          <aside class="history-panel">
+            <div class="panel-head">
+              <h4>历史会话</h4>
+              <button class="ghost-btn" id="refreshConvBtn">刷新</button>
+            </div>
+
+            <button class="primary-btn" id="newConvBtn" style="width:100%; margin-bottom:12px;">新建会话</button>
+            <div class="conversation-list" id="conversationList"></div>
+            <button class="ghost-btn" id="deleteConvBtn" style="width:100%; margin-top:14px;">删除当前会话</button>
+          </aside>
+
+          <section class="chat-panel">
+            <div class="panel-head">
+              <h4>智能解析对话</h4>
+              <span class="tag" id="currentConvText">未选择会话</span>
+            </div>
+
+            <div class="chat-window" id="chatWindow">
+              <div class="msg assistant">欢迎使用智能体检报告解析系统。你可以上传 PDF / 图片 / TXT，也可以直接输入体检指标文本。</div>
+            </div>
+
+            <div class="upload-control">
+              <label class="file-drop" for="fileInput">
+                <strong id="fileNameText">上传体检报告</strong>
+                <span>支持 PDF / PNG / JPG / JPEG / BMP / TXT</span>
+              </label>
+              <input class="file-input" id="fileInput" type="file" accept=".pdf,.png,.jpg,.jpeg,.bmp,.txt" />
+
+              <div class="send-row">
+                <div class="field">
+                  <label>输入消息</label>
+                  <textarea id="textInput" placeholder="请输入文本，或上传文件后点击发送。例如：LDL-C 4.21，ALT 58，空腹血糖 6.4"></textarea>
+                </div>
+                <button class="primary-btn" id="sendBtn" style="height:54px;">发送解析</button>
+              </div>
+            </div>
+
+            <div class="data-grid" id="indicatorTable"></div>
+          </section>
+
+          <section class="json-panel">
+            <div class="panel-head">
+              <h4>结构化 JSON</h4>
+              <button class="ghost-btn" id="copyJsonBtn">复制</button>
+            </div>
+            <pre class="json-code" id="jsonOutput">{}</pre>
+          </section>
+        </div>
+      </section>
+
+      <section class="page" id="page-report">
+        <div class="section-title">
+          <h3>报告返回和 <em>可视化说明</em></h3>
+          <p>读取上传识别接口返回的结构化 JSON，并自动渲染风险、摘要、Agent 输出、校验证据。</p>
+        </div>
+
+        <div id="reportContainer">
+          <div class="report-empty content-card">
+            暂无真实解析结果。请先进入“上传识别”发送报告或文本，系统会根据返回 JSON 自动生成报告可视化。
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-kg">
+        <div class="kg-shell">
+          <div class="section-title">
+            <h3>知识 <em>图谱</em></h3>
+            <p>支持鼠标滚轮缩放、拖动画布、节点拖拽。</p>
+          </div>
+
+          <div class="kg-wrap">
+            <svg id="kgSvg"></svg>
+
+            <div class="kg-panel">
+              <h4>四层层次化疾病知识图谱</h4>
+              <p>
+                支持缩放与拖拽。滚轮缩放，按住空白区域拖动画布，节点可单独拖拽。
+              </p>
+              <div class="kg-actions">
+                <button class="ghost-btn" id="fitKgBtn">重置视图</button>
+                <button class="ghost-btn" id="downloadKgBtn">下载 SVG</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-stats">
+        <div class="section-title">
+          <h3>数据 <em>统计</em></h3>
+          <p>根据当前会话和最近一次解析结果展示处理状态与评估指标。</p>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="metric-card">
+            <div class="label">历史会话</div>
+            <div class="value" id="statConvs">0</div>
+            <div class="desc">来自后端 conversations 接口。</div>
+          </div>
+          <div class="metric-card">
+            <div class="label">识别指标</div>
+            <div class="value" id="statIndicators">0</div>
+            <div class="desc">最近一次 JSON 中抽取的指标数量。</div>
+          </div>
+          <div class="metric-card">
+            <div class="label">异常项</div>
+            <div class="value" id="statAbnormal">0</div>
+            <div class="desc">偏高、偏低、异常、临界等状态统计。</div>
+          </div>
+          <div class="metric-card">
+            <div class="label">风险等级</div>
+            <div class="value" id="statRisk" style="font-size: 28px;">暂无</div>
+            <div class="desc">来自解析结果或前端推断。</div>
+          </div>
+        </div>
+
+        <div class="stats-panel">
+          <h3>Smart report.<br />Clear <em>evidence</em>.</h3>
+          <div class="stat-block">
+            <div class="num" id="statAccuracy">--</div>
+            <div class="lbl">Confidence</div>
+          </div>
+          <div class="stat-block">
+            <div class="num" id="statAgentNum">--</div>
+            <div class="lbl">Agents</div>
+          </div>
+          <div class="stat-block">
+            <div class="num" id="statAdviceNum">--</div>
+            <div class="lbl">Advice Items</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-advice">
+        <div class="section-title">
+          <h3>健康建议 <em>分析</em></h3>
+          <p>根据最近一次解析 JSON 中的 advice、recommendations、indicators 或风险项动态生成。</p>
+        </div>
+
+        <div class="advice-list" id="adviceList">
+          <div class="advice-item">
+            <h4>暂无健康建议</h4>
+            <p>请先进入“上传识别”上传报告或输入体检指标。系统会根据返回 JSON 自动生成个性化建议。</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <script>
+    const API_BASE = "/api";
+
+    let authToken = null;
+    let currentUserId = null;
+    let currentConversationId = null;
+    let conversationsCache = [];
+    let lastJsonResult = null;
+    let selectedFile = null;
+    let kgSimulation = null;
+    let kgZoomBehavior = null;
+
+    const fallbackResult = {
+      summary: "样例指标提示血脂、肝功能与糖代谢存在轻中度异常。系统已根据指标异常项生成结构化解释。",
+      risk_level: "中等风险",
+      indicators: [
+        { name: "低密度脂蛋白 LDL-C", value: "4.21 mmol/L", reference: "0.00 - 3.37", status: "偏高" },
+        { name: "谷丙转氨酶 ALT", value: "58 U/L", reference: "0 - 40", status: "轻度异常" },
+        { name: "空腹血糖 GLU", value: "6.4 mmol/L", reference: "3.9 - 6.1", status: "临界升高" },
+        { name: "高密度脂蛋白 HDL-C", value: "1.18 mmol/L", reference: "1.04 - 1.55", status: "正常" }
+      ],
+      agents: [
+        { name: "心血管 Agent", conclusion: "LDL-C 偏高，提示血脂异常风险需关注。", confidence: 82 },
+        { name: "肝脏 Agent", conclusion: "ALT 轻度升高，建议结合 AST、GGT、胆红素复查。", confidence: 76 },
+        { name: "内分泌 Agent", conclusion: "空腹血糖处于临界状态，建议关注糖代谢。", confidence: 79 }
+      ],
+      critique: [
+        "证据冲突检测：未发现同一指标被不同 Agent 给出相反解释。",
+        "知识一致性校验：结论与知识图谱关联关系一致。",
+        "置信度校准：所有 Agent 输出置信度均高于 60%。"
+      ],
+      advice: [
+        { title: "血脂管理建议", content: "LDL-C 偏高时，应关注膳食脂肪结构、运动频率、体重控制与家族心血管病史。", tags: ["LDL-C", "心血管风险"] },
+        { title: "肝功能复查建议", content: "ALT 轻度升高可能与脂肪肝、饮酒、药物、熬夜或感染有关，建议结合 AST、GGT、胆红素进一步判断。", tags: ["ALT", "肝功能"] },
+        { title: "糖代谢干预建议", content: "空腹血糖临界升高时，应关注精制碳水摄入、餐后血糖波动与糖化血红蛋白。", tags: ["GLU", "糖代谢"] }
+      ]
+    };
+
+    function qs(id) {
+      return document.getElementById(id);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function safeJsonText(obj) {
+      try {
+        return JSON.stringify(obj ?? {}, null, 2);
+      } catch {
+        return "{}";
+      }
+    }
+
+    function tryParseJson(value) {
+      if (!value) return null;
+      if (typeof value === "object") return value;
+      if (typeof value !== "string") return null;
+
+      try {
+        return JSON.parse(value);
+      } catch {
+        return null;
+      }
+    }
+
+    function unwrapResult(raw) {
+      const parsed = tryParseJson(raw) || raw || {};
+      return parsed.result || parsed.data?.result || parsed.data || parsed;
+    }
+
+    function cleanupReportText(text) {
+      return String(text || "")
+        .replace(/\\n/g, "\n")
+        .replace(/\\"/g, '"')
+        .replace(/^"+|"+$/g, "")
+        .trim();
+    }
+
+    function extractReportText(raw) {
+      const result = unwrapResult(raw);
+
+      if (!result || typeof result !== "object") return "";
+
+      const direct =
+        result.report_text ||
+        result.report ||
+        result.markdown ||
+        result.final_report ||
+        result.final_answer ||
+        result.answer ||
+        result.diagnosis_report ||
+        "";
+
+      if (typeof direct === "string" && direct.trim()) {
+        return cleanupReportText(direct);
+      }
+
+      const apiResult = result.report_api_result;
+      if (apiResult && typeof apiResult === "object") {
+        const apiData = apiResult.data || apiResult;
+
+        const apiText =
+          apiData.report_text ||
+          apiData.report ||
+          apiData.markdown ||
+          apiData.final_report ||
+          apiData.final_answer ||
+          apiData.answer ||
+          apiData.diagnosis_report ||
+          "";
+
+        if (typeof apiText === "string" && apiText.trim()) {
+          return cleanupReportText(apiText);
+        }
+      }
+
+      return "";
+    }
+
+    function buildStructuredJson(raw) {
+      const result = unwrapResult(raw);
+
+      if (!result || typeof result !== "object") {
+        return {};
+      }
+
+      const reportTextFields = new Set([
+        "report_text",
+        "report",
+        "markdown",
+        "final_report",
+        "final_answer",
+        "answer",
+        "diagnosis_report"
+      ]);
+
+      const indicators = normalizeIndicators(
+        result.indicators ||
+        result.metrics ||
+        result.items ||
+        result.structured_data ||
+        result.extracted_indicators ||
+        []
+      );
+
+      const agents = normalizeAgents(
+        result.agents ||
+        result.agent_outputs ||
+        result.multi_agent ||
+        result.agent_results ||
+        []
+      );
+
+      const critique = normalizeStringList(
+        result.critique ||
+        result.critiques ||
+        result.validation ||
+        result.checks ||
+        []
+      );
+
+      const advice = normalizeAdvice(
+        result.advice ||
+        result.recommendations ||
+        result.health_advice ||
+        result.suggestions ||
+        [],
+        indicators
+      );
+
+      const apiResult = result.report_api_result && typeof result.report_api_result === "object"
+        ? result.report_api_result
+        : null;
+
+      const apiData = apiResult && typeof apiResult.data === "object"
+        ? apiResult.data
+        : apiResult;
+
+      let apiStructured = null;
+
+      if (apiData && typeof apiData === "object") {
+        apiStructured = {};
+        Object.keys(apiData).forEach(key => {
+          if (!reportTextFields.has(key)) {
+            apiStructured[key] = apiData[key];
+          }
+        });
+      }
+
+      const structured = {
+        summary:
+          result.summary ||
+          result.diagnosis_summary ||
+          result.report_summary ||
+          apiData?.summary ||
+          apiData?.diagnosis_summary ||
+          apiData?.report_summary ||
+          "",
+        risk_level:
+          result.risk_level ||
+          result.risk ||
+          result.overall_risk ||
+          apiData?.risk_level ||
+          apiData?.risk ||
+          apiData?.overall_risk ||
+          inferRisk(indicators),
+        indicators,
+        agents,
+        critique,
+        advice
+      };
+
+      const metadata = {};
+      const metadataKeys = [
+        "case_id",
+        "name",
+        "gender",
+        "age",
+        "height",
+        "weight",
+        "blood_pressure",
+        "heart_rate",
+        "format",
+        "_source",
+        "_text_length",
+        "_frontend_ready",
+        "_report_api_merged"
+      ];
+
+      metadataKeys.forEach(key => {
+        if (result[key] !== undefined) {
+          metadata[key] = result[key];
+        }
+      });
+
+      if (Object.keys(metadata).length) {
+        structured.metadata = metadata;
+      }
+
+      if (apiStructured && Object.keys(apiStructured).length) {
+        structured.report_api_result = apiStructured;
+      }
+
+      return structured;
+    }
+
+    function normalizeResult(raw) {
+      if (!raw) return null;
+
+      const result = unwrapResult(raw);
+      const reportText = extractReportText(result);
+
+      const indicators =
+        result.indicators ||
+        result.metrics ||
+        result.items ||
+        result.structured_data ||
+        result.extracted_indicators ||
+        [];
+
+      const agents =
+        result.agents ||
+        result.agent_outputs ||
+        result.multi_agent ||
+        result.agent_results ||
+        [];
+
+      const advice =
+        result.advice ||
+        result.recommendations ||
+        result.health_advice ||
+        result.suggestions ||
+        [];
+
+      const critique =
+        result.critique ||
+        result.critiques ||
+        result.validation ||
+        result.checks ||
+        [];
+
+      return {
+        raw: result,
+        report_text: reportText,
+        summary:
+          result.summary ||
+          result.diagnosis_summary ||
+          result.report_summary ||
+          "系统已完成报告解析，请查看对话框中的报告分析。",
+        risk_level:
+          result.risk_level ||
+          result.risk ||
+          result.overall_risk ||
+          inferRisk(indicators),
+        indicators: normalizeIndicators(indicators),
+        agents: normalizeAgents(agents),
+        critique: normalizeStringList(critique),
+        advice: normalizeAdvice(advice, indicators)
+      };
+    }
+
+    function buildDiagnosisReportText(normalized) {
+      if (!normalized) {
+        return "解析完成，但未获得有效报告内容。";
+      }
+
+      if (normalized.report_text && normalized.report_text.trim()) {
+        return normalized.report_text.trim();
+      }
+
+      const lines = [];
+
+      lines.push("📋 智能体检报告辅助诊断书");
+      lines.push("");
+      lines.push("一、综合结论");
+      lines.push(normalized.summary || "暂无综合结论。");
+      lines.push("");
+
+      lines.push("二、风险等级");
+      lines.push(`综合风险等级：${normalized.risk_level || "未标注"}`);
+      lines.push("");
+
+      const indicators = normalized.indicators || [];
+      lines.push("三、关键体检指标");
+
+      if (indicators.length) {
+        indicators.slice(0, 12).forEach((item, index) => {
+          lines.push(
+            `${index + 1}. ${item.name || "未知指标"}：${item.value || "--"}，参考范围：${item.reference || "--"}，状态：${item.status || "未标注"}`
+          );
+        });
+
+        if (indicators.length > 12) {
+          lines.push(`其余 ${indicators.length - 12} 项指标请查看右侧结构化 JSON 或下方指标表。`);
+        }
+      } else {
+        lines.push("暂未识别到标准化体检指标。");
+      }
+
+      lines.push("");
+
+      const agents = normalized.agents || [];
+      lines.push("四、多 Agent 辅助分析");
+
+      if (agents.length) {
+        agents.forEach((agent, index) => {
+          lines.push(
+            `${index + 1}. ${agent.name || "综合分析 Agent"}：${agent.conclusion || "暂无结论。"}${agent.confidence ? ` 置信度：${agent.confidence}%` : ""}`
+          );
+        });
+      } else {
+        lines.push("后端未返回独立 Agent 结果。");
+      }
+
+      lines.push("");
+
+      const advice = normalized.advice || [];
+      lines.push("五、健康管理建议");
+
+      if (advice.length) {
+        advice.forEach((item, index) => {
+          lines.push(`${index + 1}. ${item.title || "建议"}：${item.content || ""}`);
+        });
+      } else {
+        lines.push("暂无明确健康建议。");
+      }
+
+      lines.push("");
+
+      const critique = normalized.critique || [];
+      lines.push("六、校验说明");
+
+      if (critique.length) {
+        critique.forEach((item, index) => {
+          lines.push(`${index + 1}. ${item}`);
+        });
+      } else {
+        lines.push("当前结果仅作为健康管理与辅助初筛参考，不替代医生诊断。");
+      }
+
+      lines.push("");
+      lines.push("⚠️ 免责声明：本报告由 AI 根据体检文本或 OCR 结果自动生成，仅供健康管理参考，不能替代临床医生诊断。");
+
+      return lines.join("\n");
+    }
+
+    function normalizeIndicators(list) {
+      if (!Array.isArray(list)) return [];
+
+      return list.map(item => {
+        if (!item || typeof item !== "object") {
+          return {
+            name: String(item ?? "未知指标"),
+            value: "--",
+            reference: "--",
+            status: "未标注"
+          };
+        }
+
+        return {
+          name: item.name || item.indicator || item.item || item.metric || item.指标名称 || "未知指标",
+          value: item.value || item.result || item.detected_value || item.检测值 || "--",
+          reference: item.reference || item.range || item.ref || item.参考范围 || "--",
+          status: item.status || item.flag || item.state || item.状态 || "未标注"
+        };
+      });
+    }
+
+    function normalizeAgents(list) {
+      if (!Array.isArray(list)) return [];
+
+      return list.map((item, index) => {
+        if (!item || typeof item !== "object") {
+          return {
+            name: `Agent ${index + 1}`,
+            conclusion: String(item ?? "暂无结论。"),
+            confidence: 0
+          };
+        }
+
+        return {
+          name: item.name || item.agent || item.role || `Agent ${index + 1}`,
+          conclusion: item.conclusion || item.summary || item.result || item.message || "暂无结论。",
+          confidence: Number(item.confidence || item.score || item.probability || 0)
+        };
+      });
+    }
+
+    function normalizeStringList(list) {
+      if (Array.isArray(list)) {
+        return list.map(item => {
+          if (typeof item === "string") return item;
+          return item.message || item.content || item.result || JSON.stringify(item);
+        });
+      }
+
+      if (typeof list === "string") return [list];
+
+      if (list && typeof list === "object") {
+        return Object.entries(list).map(([k, v]) => `${k}：${typeof v === "string" ? v : JSON.stringify(v)}`);
+      }
+
+      return [];
+    }
+
+    function normalizeAdvice(advice, indicators) {
+      if (Array.isArray(advice) && advice.length) {
+        return advice.map((item, index) => {
+          if (typeof item === "string") {
+            return {
+              title: `建议 ${index + 1}`,
+              content: item,
+              tags: []
+            };
+          }
+
+          return {
+            title: item.title || item.name || item.category || `建议 ${index + 1}`,
+            content: item.content || item.text || item.message || item.suggestion || JSON.stringify(item),
+            tags: item.tags || item.related || []
+          };
+        });
+      }
+
+      const normalizedIndicators = normalizeIndicators(indicators);
+      const generated = [];
+
+      normalizedIndicators.forEach(ind => {
+        const text = `${ind.name} ${ind.status}`.toLowerCase();
+
+        if (text.includes("ldl") || text.includes("脂蛋白") || text.includes("胆固醇")) {
+          generated.push({
+            title: "血脂管理建议",
+            content: `${ind.name} 当前状态为“${ind.status}”，建议结合血压、BMI、吸烟史、家族史综合评估心血管风险，并关注饮食脂肪结构与规律运动。`,
+            tags: [ind.name, ind.status]
+          });
+        } else if (text.includes("alt") || text.includes("转氨酶") || text.includes("肝")) {
+          generated.push({
+            title: "肝功能复查建议",
+            content: `${ind.name} 当前状态为“${ind.status}”，建议结合 AST、GGT、胆红素及肝胆超声进一步判断，近期避免饮酒、熬夜和自行用药。`,
+            tags: [ind.name, ind.status]
+          });
+        } else if (text.includes("glu") || text.includes("血糖") || text.includes("糖")) {
+          generated.push({
+            title: "糖代谢干预建议",
+            content: `${ind.name} 当前状态为“${ind.status}”，建议关注精制碳水摄入、餐后血糖波动，并结合糖化血红蛋白进行周期性复查。`,
+            tags: [ind.name, ind.status]
+          });
+        }
+      });
+
+      if (!generated.length && normalizedIndicators.length) {
+        generated.push({
+          title: "综合复查建议",
+          content: "已识别到体检指标，请结合异常状态、既往病史和症状进行综合判断。若存在持续异常或明显不适，应及时就医复查。",
+          tags: ["综合建议"]
+        });
+      }
+
+      return generated;
+    }
+
+    function inferRisk(indicators) {
+      const arr = normalizeIndicators(indicators);
+      const abnormal = arr.filter(x => /高|低|异常|临界|阳性|风险/i.test(String(x.status))).length;
+
+      if (abnormal >= 3) return "中高风险";
+      if (abnormal >= 1) return "中等风险";
+      return "低风险";
+    }
+
+    function statusClass(status) {
+      const s = String(status || "");
+      if (/高|异常|阳性|危险|重度/i.test(s)) return "status-high";
+      if (/临界|轻度|偏低|偏高/i.test(s)) return "status-mid";
+      return "status-low";
+    }
+
+    async function apiFetch(path, options = {}) {
+      const headers = options.headers || {};
+
+      if (authToken) {
+        headers.Authorization = `Bearer ${authToken}`;
+      }
+
+      return fetch(`${API_BASE}${path}`, {
+        ...options,
+        headers
+      });
+    }
+
+    async function handleLogin(isRegister = false) {
+      const username = isRegister ? qs("regUsername").value.trim() : qs("loginUsername").value.trim();
+      const password = isRegister ? qs("regPassword").value.trim() : qs("loginPassword").value.trim();
+      const msgEl = isRegister ? qs("regMsg") : qs("loginMsg");
+
+      if (!username || !password) {
+        msgEl.textContent = "请输入账号和密码。";
+        return;
+      }
+
+      msgEl.textContent = "正在连接后端...";
+
+      try {
+        const res = await fetch(`${API_BASE}/${isRegister ? "register" : "login"}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (data.code === 0) {
+          const tokenData = data.data || {};
+          authToken = tokenData.access_token;
+          currentUserId = tokenData.user_id;
+          qs("userPill").textContent = `用户：${username}`;
+          msgEl.textContent = "登录成功";
+          await loadConversations();
+          enterApp();
+        } else {
+          msgEl.textContent = data.msg || "认证失败。";
+        }
+      } catch (err) {
+        console.warn(err);
+        msgEl.textContent = "后端未连接，已进入前端演示模式。";
+        authToken = "demo-token";
+        currentUserId = 0;
+        qs("userPill").textContent = `演示用户：${username || "demo"}`;
+        conversationsCache = [];
+        renderConversations();
+        enterApp();
+      }
+    }
+
+    async function loadConversations() {
+      if (!authToken || authToken === "demo-token") {
+        conversationsCache = [];
+        renderConversations();
+        return;
+      }
+
+      try {
+        const res = await apiFetch("/conversations");
+        const data = await res.json();
+        conversationsCache = data.code === 0 ? data.data || [] : [];
+      } catch {
+        conversationsCache = [];
+      }
+
+      renderConversations();
+    }
+
+    function renderConversations() {
+      qs("conversationCount").textContent = conversationsCache.length;
+      qs("statConvs").textContent = conversationsCache.length;
+
+      const box = qs("conversationList");
+      box.innerHTML = "";
+
+      if (!conversationsCache.length) {
+        box.innerHTML = `<div class="conversation-item">暂无历史会话</div>`;
+        return;
+      }
+
+      conversationsCache.forEach(conv => {
+        const div = document.createElement("div");
+        div.className = "conversation-item" + (conv.id === currentConversationId ? " active" : "");
+        div.textContent = `${conv.title || "未命名会话"} · ID ${conv.id}`;
+        div.onclick = () => selectConversation(conv.id);
+        box.appendChild(div);
+      });
+    }
+
+    async function selectConversation(id) {
+      currentConversationId = id;
+      qs("currentConvText").textContent = `会话 ID：${id}`;
+      renderConversations();
+
+      if (!authToken || authToken === "demo-token") return;
+
+      try {
+        const res = await apiFetch(`/history/${id}`);
+        const data = await res.json();
+
+        if (data.code === 0) {
+          renderHistoryMessages(data.data || []);
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    }
+
+    function renderHistoryMessages(messages) {
+      const chat = qs("chatWindow");
+      chat.innerHTML = "";
+
+      let latestJson = null;
+
+      messages.forEach(msg => {
+        const role = String(msg.role || "").toLowerCase();
+        const content = msg.message || msg.content || "";
+
+        appendMessage(role.includes("user") ? "user" : "assistant", content, false);
+
+        if (msg.json_result) {
+          latestJson = tryParseJson(msg.json_result) || msg.json_result;
+        }
+      });
+
+      if (latestJson) {
+        lastJsonResult = normalizeResult(latestJson);
+        qs("jsonOutput").textContent = safeJsonText(buildStructuredJson(latestJson));
+        updateAllViews();
+      }
+    }
+
+    function appendMessage(role, text, scroll = true) {
+      const div = document.createElement("div");
+      div.className = `msg ${role}`;
+      div.textContent = text;
+      qs("chatWindow").appendChild(div);
+
+      if (scroll) {
+        qs("chatWindow").scrollTop = qs("chatWindow").scrollHeight;
+      }
+    }
+
+    function replaceLastAssistant(text) {
+      const msgs = qs("chatWindow").querySelectorAll(".msg.assistant");
+      const last = msgs[msgs.length - 1];
+
+      if (last) {
+        last.textContent = text;
+      } else {
+        appendMessage("assistant", text);
+      }
+
+      qs("chatWindow").scrollTop = qs("chatWindow").scrollHeight;
+    }
+
+    function newConversation() {
+      currentConversationId = null;
+      qs("currentConvText").textContent = "新会话";
+      qs("chatWindow").innerHTML = `<div class="msg assistant">已创建新会话。请输入文本或上传文件开始解析。</div>`;
+      qs("jsonOutput").textContent = "{}";
+      lastJsonResult = null;
+      updateAllViews();
+      renderConversations();
+    }
+
+    async function deleteConversation() {
+      if (!currentConversationId) {
+        alert("当前没有选中的会话。");
+        return;
+      }
+
+      if (authToken && authToken !== "demo-token") {
+        try {
+          await apiFetch(`/conversation/${currentConversationId}`, { method: "DELETE" });
+        } catch {}
+      }
+
+      currentConversationId = null;
+      await loadConversations();
+      newConversation();
+    }
+
+    async function sendMessage() {
+      const text = qs("textInput").value.trim();
+      const file = selectedFile;
+
+      if (!text && !file) {
+        alert("请输入文本或上传文件。");
+        return;
+      }
+
+      const displayText = [text, file ? `[文件：${file.name}]` : ""].filter(Boolean).join("\n");
+      appendMessage("user", displayText);
+      appendMessage("assistant", "正在解析，请稍候...");
+
+      if (!authToken || authToken === "demo-token") {
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        lastJsonResult = normalizeResult(fallbackResult);
+        qs("jsonOutput").textContent = safeJsonText(buildStructuredJson(fallbackResult));
+
+        const demoReportText = buildDiagnosisReportText(lastJsonResult);
+        replaceLastAssistant(demoReportText);
+
+        qs("textInput").value = "";
+        selectedFile = null;
+        qs("fileInput").value = "";
+        qs("fileNameText").textContent = "上传体检报告";
+
+        updateAllViews();
+        return;
+      }
+
+      try {
+        const form = new FormData();
+        form.append("text", text);
+
+        if (currentConversationId) {
+          form.append("conversation_id", currentConversationId);
+        }
+
+        if (file) {
+          form.append("file", file, file.name);
+        }
+
+        const res = await fetch(`${API_BASE}/chat`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          },
+          body: form
+        });
+
+        const data = await res.json();
+
+        if (data.code === 0) {
+          const chatData = data.data || {};
+          currentConversationId = chatData.conversation_id || currentConversationId;
+
+          const result = chatData.result || {};
+          lastJsonResult = normalizeResult(result);
+
+          qs("jsonOutput").textContent = safeJsonText(buildStructuredJson(result));
+
+          const reportText = buildDiagnosisReportText(lastJsonResult);
+          replaceLastAssistant(reportText);
+
+          qs("textInput").value = "";
+          selectedFile = null;
+          qs("fileInput").value = "";
+          qs("fileNameText").textContent = "上传体检报告";
+          qs("currentConvText").textContent = currentConversationId ? `会话 ID：${currentConversationId}` : "未选择会话";
+
+          await loadConversations();
+          updateAllViews();
+        } else {
+          replaceLastAssistant(`错误：${data.msg || "解析失败"}`);
+        }
+      } catch (err) {
+        console.warn(err);
+
+        lastJsonResult = normalizeResult(fallbackResult);
+        qs("jsonOutput").textContent = safeJsonText(buildStructuredJson(fallbackResult));
+
+        const fallbackReportText = buildDiagnosisReportText(lastJsonResult);
+        replaceLastAssistant(`后端请求失败，已切换为演示解析结果。\n\n${fallbackReportText}`);
+
+        updateAllViews();
+      }
+    }
+
+    function updateAllViews() {
+      renderIndicatorTable();
+      renderReport();
+      renderAdvice();
+      renderStats();
+    }
+
+    function renderIndicatorTable() {
+      const box = qs("indicatorTable");
+      box.innerHTML = "";
+
+      const indicators = lastJsonResult?.indicators || [];
+
+      if (!indicators.length) return;
+
+      const header = document.createElement("div");
+      header.className = "data-row";
+      header.innerHTML = `<strong>指标名称</strong><strong>检测值</strong><strong>参考范围</strong><strong>状态</strong>`;
+      box.appendChild(header);
+
+      indicators.forEach(ind => {
+        const row = document.createElement("div");
+        row.className = "data-row";
+        row.innerHTML = `
+          <span>${escapeHtml(ind.name)}</span>
+          <span>${escapeHtml(ind.value)}</span>
+          <span>${escapeHtml(ind.reference)}</span>
+          <span class="${statusClass(ind.status)}">${escapeHtml(ind.status)}</span>
+        `;
+        box.appendChild(row);
+      });
+    }
+
+    function renderReport() {
+      const container = qs("reportContainer");
+
+      if (!lastJsonResult) {
+        container.innerHTML = `
+          <div class="report-empty content-card">
+            暂无真实解析结果。请先进入“上传识别”发送报告或文本，系统会根据返回 JSON 自动生成报告可视化。
+          </div>
+        `;
+        return;
+      }
+
+      const agents = lastJsonResult.agents || [];
+      const critique = lastJsonResult.critique || [];
+
+      container.innerHTML = `
+        <div class="report-hero content-card">
+          <span class="risk-badge">综合风险等级：${escapeHtml(lastJsonResult.risk_level || "未标注")}</span>
+          <h4>综合诊断摘要</h4>
+          <p>${escapeHtml(lastJsonResult.summary)}</p>
+        </div>
+
+        <div class="three-col" style="margin-top:20px;">
+          ${
+            agents.length
+              ? agents.map(agent => `
+                <div class="agent-card">
+                  <h4>${escapeHtml(agent.name)}</h4>
+                  <p>${escapeHtml(agent.conclusion)}</p>
+                  <div class="confidence">${agent.confidence ? escapeHtml(agent.confidence) + "%" : "--"}</div>
+                  <p class="status-mid">输出置信度与证据请结合 JSON 结果复核。</p>
+                </div>
+              `).join("")
+              : `
+                <div class="agent-card">
+                  <h4>综合分析 Agent</h4>
+                  <p>${escapeHtml(lastJsonResult.summary)}</p>
+                  <div class="confidence">--</div>
+                  <p class="status-mid">后端未返回独立 Agent 结果。</p>
+                </div>
+              `
+          }
+        </div>
+
+        <div class="content-card" style="margin-top:20px;">
+          <div class="section-title">
+            <h3>Critique <em>校验说明</em></h3>
+            <p>根据后端返回的校验、验证或 critique 字段自动渲染。</p>
+          </div>
+          <div class="evidence-list">
+            ${
+              critique.length
+                ? critique.map(item => `<div class="evidence-item">${escapeHtml(item)}</div>`).join("")
+                : `<div class="evidence-item">后端未返回 Critique 字段。建议在接口结果中加入 critique / validation / checks 字段。</div>`
+            }
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAdvice() {
+      const box = qs("adviceList");
+
+      if (!lastJsonResult) {
+        box.innerHTML = `
+          <div class="advice-item">
+            <h4>暂无健康建议</h4>
+            <p>请先进入“上传识别”上传报告或输入体检指标。系统会根据返回 JSON 自动生成个性化建议。</p>
+          </div>
+        `;
+        return;
+      }
+
+      const advice = lastJsonResult.advice || [];
+
+      if (!advice.length) {
+        box.innerHTML = `
+          <div class="advice-item">
+            <h4>暂无可用建议</h4>
+            <p>后端没有返回 advice / recommendations 字段，且前端未能从指标中推断出建议。</p>
+          </div>
+        `;
+        return;
+      }
+
+      box.innerHTML = advice.map(item => `
+        <div class="advice-item">
+          <h4>${escapeHtml(item.title)}</h4>
+          <p>${escapeHtml(item.content)}</p>
+          <div class="advice-meta">
+            ${(item.tags || []).map(tag => `<span class="advice-tag">${escapeHtml(tag)}</span>`).join("")}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderStats() {
+      const indicators = lastJsonResult?.indicators || [];
+      const abnormal = indicators.filter(x => /高|低|异常|临界|阳性|风险/i.test(String(x.status))).length;
+      const agents = lastJsonResult?.agents || [];
+      const advice = lastJsonResult?.advice || [];
+
+      qs("statIndicators").textContent = indicators.length;
+      qs("statAbnormal").textContent = abnormal;
+      qs("statRisk").textContent = lastJsonResult?.risk_level || "暂无";
+      qs("statAgentNum").textContent = agents.length || "--";
+      qs("statAdviceNum").textContent = advice.length || "--";
+
+      if (agents.length) {
+        const avg = Math.round(agents.reduce((s, a) => s + Number(a.confidence || 0), 0) / agents.length);
+        qs("statAccuracy").textContent = avg ? `${avg}%` : "--";
+      } else {
+        qs("statAccuracy").textContent = "--";
+      }
+    }
+
+    async function copyJson() {
+      const text = qs("jsonOutput").textContent || "{}";
+      await navigator.clipboard.writeText(text);
+      alert("结构化 JSON 已复制。");
+    }
+
+    const kgData = {
+      nodes: [
+        { id: "医疗诊断知识图谱", level: 0 },
+        { id: "呼吸系统", parent: "医疗诊断知识图谱", level: 1 },
+        { id: "心血管系统", parent: "医疗诊断知识图谱", level: 1 },
+        { id: "胃肠系统", parent: "医疗诊断知识图谱", level: 1 },
+        { id: "感染性疾病", parent: "医疗诊断知识图谱", level: 1 },
+        { id: "神经肌肉系统", parent: "医疗诊断知识图谱", level: 1 },
+        { id: "自身免疫疾病", parent: "医疗诊断知识图谱", level: 1 },
+        { id: "血液系统疾病", parent: "医疗诊断知识图谱", level: 1 },
+        { id: "精神压力相关疾病", parent: "医疗诊断知识图谱", level: 1 },
+        { id: "肺炎", parent: "呼吸系统", level: 2 },
+        { id: "支气管炎", parent: "呼吸系统", level: 2 },
+        { id: "肺栓塞", parent: "呼吸系统", level: 2 },
+        { id: "自发性气胸", parent: "呼吸系统", level: 2 },
+        { id: "稳定型心绞痛", parent: "心血管系统", level: 2 },
+        { id: "不稳定型心绞痛", parent: "心血管系统", level: 2 },
+        { id: "心房颤动", parent: "心血管系统", level: 2 },
+        { id: "心肌炎", parent: "心血管系统", level: 2 },
+        { id: "胃食管反流", parent: "胃肠系统", level: 2 },
+        { id: "胰腺肿瘤", parent: "胃肠系统", level: 2 },
+        { id: "流感", parent: "感染性疾病", level: 2 },
+        { id: "结核病", parent: "感染性疾病", level: 2 },
+        { id: "HIV初次感染", parent: "感染性疾病", level: 2 },
+        { id: "重症肌无力", parent: "神经肌肉系统", level: 2 },
+        { id: "吉兰巴雷综合征", parent: "神经肌肉系统", level: 2 },
+        { id: "系统性红斑狼疮", parent: "自身免疫疾病", level: 2 },
+        { id: "过敏性休克", parent: "自身免疫疾病", level: 2 },
+        { id: "贫血", parent: "血液系统疾病", level: 2 },
+        { id: "惊恐发作", parent: "精神压力相关疾病", level: 2 },
+        { id: "LDL-C偏高", parent: "稳定型心绞痛", level: 3 },
+        { id: "胸痛放射至肩颈", parent: "不稳定型心绞痛", level: 3 },
+        { id: "心悸与节律不齐", parent: "心房颤动", level: 3 },
+        { id: "ALT升高", parent: "胃食管反流", level: 3 },
+        { id: "空腹血糖升高", parent: "系统性红斑狼疮", level: 3 }
+      ],
+      edges: []
+    };
+
+    kgData.edges = kgData.nodes
+      .filter(node => node.parent)
+      .map(node => ({ source: node.parent, target: node.id }));
+
+    function drawKnowledgeGraph() {
+      renderKnowledgeGraph(kgData);
+    }
+
+    function renderKnowledgeGraph(data) {
+      const container = document.querySelector(".kg-wrap");
+      const svgElement = qs("kgSvg");
+
+      if (!container || !svgElement || typeof d3 === "undefined") return;
+
+      if (kgSimulation) kgSimulation.stop();
+
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      const svg = d3.select(svgElement);
+      svg.selectAll("*").remove();
+
+      svg
+        .attr("width", width)
+        .attr("height", height)
+        .attr("viewBox", `0 0 ${width} ${height}`);
+
+      const zoomLayer = svg.append("g").attr("class", "kg-zoom-layer");
+      const linkLayer = zoomLayer.append("g");
+      const nodeLayer = zoomLayer.append("g");
+      const textLayer = zoomLayer.append("g");
+
+      kgZoomBehavior = d3.zoom()
+        .scaleExtent([0.35, 2.5])
+        .on("zoom", event => {
+          zoomLayer.attr("transform", event.transform);
+        });
+
+      svg.call(kgZoomBehavior);
+
+      const nodes = data.nodes.map(d => ({ ...d }));
+      const edges = data.edges.map(d => ({ ...d }));
+
+      const baseNodeSize = Math.min(70, Math.max(48, width / 24));
+      const sizeIncrement = 10;
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const radiusIncrement = Math.min(width, height) / 4.25;
+
+      const root = nodes.find(n => n.level === 0);
+      if (!root) return;
+
+      root.x = centerX;
+      root.y = centerY;
+
+      function layoutChildren(parent) {
+        const children = nodes.filter(n => n.parent === parent.id);
+        if (!children.length) return;
+
+        const radius = Math.max(120, (parent.level + 1) * radiusIncrement);
+        const step = 2 * Math.PI / children.length;
+
+        children.forEach((child, i) => {
+          const angle = i * step - Math.PI / 2;
+          child.x = parent.x + radius * Math.cos(angle);
+          child.y = parent.y + radius * Math.sin(angle);
+          layoutChildren(child);
+        });
+      }
+
+      layoutChildren(root);
+
+      kgSimulation = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(edges).id(d => d.id).distance(d => {
+          const level = d.target.level || 1;
+          if (level === 1) return 180;
+          if (level === 2) return 160;
+          return 145;
+        }).strength(0.35))
+        .force("charge", d3.forceManyBody().strength(d => d.level === 0 ? -650 : d.level === 1 ? -420 : -260))
+        .force("center", d3.forceCenter(centerX, centerY))
+        .force("collision", d3.forceCollide().radius(d => baseNodeSize - d.level * sizeIncrement + 28))
+        .alpha(0.95)
+        .restart();
+
+      const link = linkLayer.selectAll("line")
+        .data(edges)
+        .enter()
+        .append("line")
+        .attr("class", "kg-link");
+
+      const node = nodeLayer.selectAll("circle")
+        .data(nodes)
+        .enter()
+        .append("circle")
+        .attr("class", "kg-node")
+        .attr("r", d => Math.max(10, baseNodeSize - d.level * sizeIncrement - 6))
+        .attr("fill", d => {
+          if (d.level === 0) return "rgba(217,53,31,0.95)";
+          if (d.level === 1) return "rgba(255,250,240,0.88)";
+          if (d.level === 2) return "rgba(255,250,240,0.64)";
+          return "rgba(255,250,240,0.15)";
+        })
+        .attr("stroke", d => d.level === 0 ? "rgba(217,53,31,0.9)" : "rgba(20,20,22,0.42)")
+        .attr("stroke-width", d => d.level <= 1 ? 1.4 : 0.9)
+        .call(
+          d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended)
+        );
+
+      const text = textLayer.selectAll("text")
+        .data(nodes)
+        .enter()
+        .append("text")
+        .attr("class", "kg-label")
+        .style("font-size", d => d.level === 0 ? "13px" : "11px")
+        .style("fill", d => d.level === 0 ? "#fffaf2" : "#24242a")
+        .attr("dominant-baseline", "middle")
+        .attr("text-anchor", "middle")
+        .each(function(d) {
+          const el = d3.select(this);
+          splitTextForKg(d.id, d.level <= 1 ? 76 : 60).forEach((line, i, arr) => {
+            el.append("tspan")
+              .attr("x", 0)
+              .attr("dy", i === 0 ? `${-(arr.length - 1) * 6}px` : "13px")
+              .text(line);
+          });
+        });
+
+      kgSimulation.on("tick", () => {
+        nodes.forEach(d => {
+          const pad = 60;
+          d.x = Math.max(pad, Math.min(width - pad, d.x));
+          d.y = Math.max(pad, Math.min(height - pad, d.y));
+        });
+
+        link
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+
+        node
+          .attr("cx", d => d.x)
+          .attr("cy", d => d.y);
+
+        text.attr("transform", d => `translate(${d.x},${d.y})`);
+      });
+
+      svg.transition()
+        .duration(450)
+        .call(
+          kgZoomBehavior.transform,
+          d3.zoomIdentity.translate(width * 0.02, height * 0.02).scale(0.94)
+        );
+
+      function dragstarted(event, d) {
+        if (!event.active) kgSimulation.alphaTarget(0.25).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      }
+
+      function dragged(event, d) {
+        d.fx = event.x;
+        d.fy = event.y;
+      }
+
+      function dragended(event, d) {
+        if (!event.active) kgSimulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      }
+    }
+
+    function resetKgView() {
+      const svgElement = qs("kgSvg");
+      if (!svgElement || !kgZoomBehavior) return;
+
+      const container = document.querySelector(".kg-wrap");
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      d3.select(svgElement)
+        .transition()
+        .duration(450)
+        .call(
+          kgZoomBehavior.transform,
+          d3.zoomIdentity.translate(width * 0.02, height * 0.02).scale(0.94)
+        );
+    }
+
+    function splitTextForKg(text, maxLength) {
+      const ctx = document.createElement("canvas").getContext("2d");
+      ctx.font = "11px DM Sans, Noto Serif SC, Arial";
+
+      const chars = String(text).split("");
+      const lines = [];
+      let currentLine = "";
+
+      chars.forEach(char => {
+        const testLine = currentLine + char;
+        const width = ctx.measureText(testLine).width;
+
+        if (width < maxLength) {
+          currentLine = testLine;
+        } else {
+          if (currentLine) lines.push(currentLine);
+          currentLine = char;
+        }
+      });
+
+      if (currentLine) lines.push(currentLine);
+      return lines.slice(0, 3);
+    }
+
+    function downloadKnowledgeGraphSvg() {
+      const svgNode = qs("kgSvg");
+      if (!svgNode) return;
+
+      const serializer = new XMLSerializer();
+      const source = serializer.serializeToString(svgNode);
+      const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "medical-knowledge-graph.svg";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      URL.revokeObjectURL(url);
+    }
+
+    function enterApp() {
+      authShell.classList.add("hidden");
+      appShell.classList.remove("hidden");
+
+      if (window.gsap) {
+        gsap.from(".top-nav", { opacity: 0, y: -20, duration: 0.55, ease: "power3.out" });
+        gsap.from(".hero-title-top, .hero-desc, .hero-tags .tag, .metric-card", {
+          opacity: 0,
+          y: 26,
+          duration: 0.7,
+          stagger: 0.05,
+          ease: "power3.out"
+        });
+      }
+    }
+
+    function logout() {
+      authToken = null;
+      currentUserId = null;
+      currentConversationId = null;
+      conversationsCache = [];
+      lastJsonResult = null;
+      selectedFile = null;
+
+      appShell.classList.add("hidden");
+      authShell.classList.remove("hidden");
+    }
+
+    const authTabs = document.querySelectorAll(".auth-tab");
+    const loginForm = qs("loginForm");
+    const registerForm = qs("registerForm");
+    const authShell = qs("authShell");
+    const appShell = qs("appShell");
+
+    authTabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        authTabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+
+        const type = tab.dataset.authTab;
+        loginForm.classList.toggle("hidden", type !== "login");
+        registerForm.classList.toggle("hidden", type !== "register");
+      });
+    });
+
+    document.querySelectorAll(".nav-item").forEach(item => {
+      item.addEventListener("click", () => {
+        const key = item.dataset.page;
+
+        document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
+        item.classList.add("active");
+
+        document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+        qs("page-" + key).classList.add("active");
+
+        if (key === "kg") {
+          setTimeout(drawKnowledgeGraph, 100);
+        }
+
+        if (window.gsap) {
+          gsap.fromTo(
+            qs("page-" + key).children,
+            { opacity: 0, y: 22 },
+            { opacity: 1, y: 0, duration: 0.5, stagger: 0.05, ease: "power3.out" }
+          );
+        }
+      });
+    });
+
+    qs("loginBtn").addEventListener("click", () => handleLogin(false));
+    qs("registerBtn").addEventListener("click", () => handleLogin(true));
+    qs("logoutBtn").addEventListener("click", logout);
+    qs("refreshConvBtn").addEventListener("click", loadConversations);
+    qs("newConvBtn").addEventListener("click", newConversation);
+    qs("deleteConvBtn").addEventListener("click", deleteConversation);
+    qs("sendBtn").addEventListener("click", sendMessage);
+    qs("copyJsonBtn").addEventListener("click", copyJson);
+    qs("downloadKgBtn").addEventListener("click", downloadKnowledgeGraphSvg);
+    qs("fitKgBtn").addEventListener("click", resetKgView);
+
+    qs("fileInput").addEventListener("change", event => {
+      selectedFile = event.target.files[0] || null;
+      qs("fileNameText").textContent = selectedFile ? `已选择：${selectedFile.name}` : "上传体检报告";
+    });
+
+    qs("textInput").addEventListener("keydown", event => {
+      if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+        sendMessage();
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      const kgPage = qs("page-kg");
+      if (kgPage && kgPage.classList.contains("active")) {
+        clearTimeout(window.__kgResizeTimer);
+        window.__kgResizeTimer = setTimeout(drawKnowledgeGraph, 180);
+      }
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      if (window.gsap) {
+        gsap.from(".auth-stage", {
+          opacity: 0,
+          y: 28,
+          scale: 0.97,
+          duration: 0.85,
+          ease: "power3.out"
+        });
+
+        gsap.from(".centerbox", {
+          x: -70,
+          opacity: 0,
+          duration: 0.8,
+          delay: 0.2,
+          ease: "back.out(1.2)"
+        });
+
+        gsap.from(".stage-article h1, .stage-article p, .topic-list li, .mini-link", {
+          opacity: 0,
+          x: 30,
+          duration: 0.65,
+          stagger: 0.05,
+          delay: 0.3,
+          ease: "power3.out"
+        });
+      }
+
+      renderConversations();
+      renderStats();
+    });
+  </script>
+</body>
+</html>
