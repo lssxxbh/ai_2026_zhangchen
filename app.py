@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from api import auth_router, chat_router, history_router
+from api import auth_router, chat_router, history_router, graph_router
 from utils import logger
 
 
@@ -48,6 +48,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(chat_router)
 app.include_router(history_router)
+app.include_router(graph_router)
 
 
 # =========================

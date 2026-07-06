@@ -4,6 +4,7 @@ from services.text_clean_service import TextCleanService
 from services.ai_service import AIService
 from services.parser_service import ParserService
 from services.conversation_service import ConversationService
+from services.graph_service import GraphService
 
 __all__ = [
     "OCRService",
@@ -12,4 +13,5 @@ __all__ = [
     "AIService",
     "ParserService",
     "ConversationService",
+    "GraphService",
 ]

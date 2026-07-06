@@ -6,11 +6,12 @@
   <title>多模态医疗报告智能解读与多 Agent 辅助诊断系统</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..900;1,9..40,400..900&family=Noto+Serif+SC:wght@500;600;700;900&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..900;1,9..40,400..900&family=Noto+Serif+SC:wght@500;600;700;900&display=swap" rel="stylesheet" />
 
-  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
   <style>
     :root {
@@ -1125,17 +1126,13 @@
     }
 
     .kg-panel {
-      position: absolute;
-      right: 24px;
-      top: 24px;
-      width: 330px;
       padding: 20px;
       border-radius: 24px;
       background: rgba(255,250,240,0.9);
       backdrop-filter: blur(18px);
       border: 1px solid rgba(20,20,22,0.09);
       box-shadow: 0 18px 34px -24px rgba(0,0,0,0.32);
-      z-index: 5;
+      align-self: flex-start;
     }
 
     .kg-panel h4 {
@@ -1883,22 +1880,64 @@
         <div class="kg-shell">
           <div class="section-title">
             <h3>知识 <em>图谱</em></h3>
-            <p>支持鼠标滚轮缩放、拖动画布、节点拖拽。</p>
+            <p>支持搜索、筛选、放大缩小、节点拖拽等交互。</p>
           </div>
 
-          <div class="kg-wrap">
-            <svg id="kgSvg"></svg>
+          <div class="kg-toolbar" style="margin-bottom:12px; display:flex; gap:10px; flex-wrap:wrap;">
+            <div class="field" style="flex:1; min-width:200px; margin-bottom:0;">
+              <input id="kgSearchInput" type="text" placeholder="搜索节点名称..." />
+            </div>
+            <select id="kgFilterSelect" class="ghost-btn" style="border-radius:18px;">
+              <option value="all">全部节点</option>
+              <option value="system">系统</option>
+              <option value="category">子类</option>
+              <option value="disease">疾病</option>
+              <option value="symptom">症状</option>
+              <option value="risk_factor">危险因素</option>
+              <option value="therapy">治疗</option>
+            </select>
+            <select id="kgLayoutSelect" class="ghost-btn" style="border-radius:18px;">
+              <option value="force">力导向布局</option>
+              <option value="circular">环形布局</option>
+              <option value="tree">树形布局</option>
+            </select>
+            <select id="kgExpandToLevel" class="ghost-btn" style="border-radius:18px;">
+              <option value="1">展开到系统</option>
+              <option value="2">展开到子类</option>
+              <option value="3">展开到疾病</option>
+              <option value="4">展开全部</option>
+            </select>
+            <button class="ghost-btn" id="kgExpandAll">展开</button>
+            <button class="ghost-btn" id="kgZoomIn">放大</button>
+            <button class="ghost-btn" id="kgZoomOut">缩小</button>
+            <button class="ghost-btn" id="kgReset">重置</button>
+            <button class="ghost-btn" id="kgFitView">适应窗口</button>
+            <button class="ghost-btn" id="kgExport">导出 PNG</button>
+          </div>
 
-            <div class="kg-panel">
-              <h4>四层层次化疾病知识图谱</h4>
-              <p>
-                支持缩放与拖拽。滚轮缩放，按住空白区域拖动画布，节点可单独拖拽。
+          <div class="kg-container" style="display: flex; gap: 12px;">
+            <div class="kg-wrap" style="flex: 1;">
+              <div id="kgEcharts" style="width:100%; height:100%;"></div>
+            </div>
+            
+            <div class="kg-panel" style="flex-shrink: 0; width: 330px;">
+              <h4>医学知识图谱</h4>
+              <p id="kgPanelContent">
+                点击节点查看详情，双击疾病节点展开/收起关联的症状、危险因素和治疗。右键节点打开菜单。
               </p>
-              <div class="kg-actions">
-                <button class="ghost-btn" id="fitKgBtn">重置视图</button>
-                <button class="ghost-btn" id="downloadKgBtn">下载 SVG</button>
+              <div class="kg-actions" id="kgNodeActions" style="display:none; margin-top:12px;">
+                <button class="ghost-btn" id="kgExpandNeighbors">展开邻居</button>
+                <button class="ghost-btn" id="kgCollapseNeighbors">收起邻居</button>
+                <button class="ghost-btn" id="kgCopyName">复制名称</button>
               </div>
             </div>
+          </div>
+
+          <div id="kgContextMenu" style="position:fixed; display:none; z-index:1000; background:rgba(255,250,240,0.95); border:1px solid rgba(20,20,22,0.12); border-radius:12px; padding:8px; box-shadow:0 12px 24px rgba(0,0,0,0.15);">
+            <div style="padding:8px 12px; cursor:pointer; border-radius:8px;" id="ctxViewDetail">查看详情</div>
+            <div style="padding:8px 12px; cursor:pointer; border-radius:8px;" id="ctxExpandNeighbors">展开邻居</div>
+            <div style="padding:8px 12px; cursor:pointer; border-radius:8px;" id="ctxCollapseNeighbors">收起邻居</div>
+            <div style="padding:8px 12px; cursor:pointer; border-radius:8px;" id="ctxCopyName">复制名称</div>
           </div>
         </div>
       </section>
@@ -2928,279 +2967,893 @@
       alert("结构化 JSON 已复制。");
     }
 
-    const kgData = {
-      nodes: [
-        { id: "医疗诊断知识图谱", level: 0 },
-        { id: "呼吸系统", parent: "医疗诊断知识图谱", level: 1 },
-        { id: "心血管系统", parent: "医疗诊断知识图谱", level: 1 },
-        { id: "胃肠系统", parent: "医疗诊断知识图谱", level: 1 },
-        { id: "感染性疾病", parent: "医疗诊断知识图谱", level: 1 },
-        { id: "神经肌肉系统", parent: "医疗诊断知识图谱", level: 1 },
-        { id: "自身免疫疾病", parent: "医疗诊断知识图谱", level: 1 },
-        { id: "血液系统疾病", parent: "医疗诊断知识图谱", level: 1 },
-        { id: "精神压力相关疾病", parent: "医疗诊断知识图谱", level: 1 },
-        { id: "肺炎", parent: "呼吸系统", level: 2 },
-        { id: "支气管炎", parent: "呼吸系统", level: 2 },
-        { id: "肺栓塞", parent: "呼吸系统", level: 2 },
-        { id: "自发性气胸", parent: "呼吸系统", level: 2 },
-        { id: "稳定型心绞痛", parent: "心血管系统", level: 2 },
-        { id: "不稳定型心绞痛", parent: "心血管系统", level: 2 },
-        { id: "心房颤动", parent: "心血管系统", level: 2 },
-        { id: "心肌炎", parent: "心血管系统", level: 2 },
-        { id: "胃食管反流", parent: "胃肠系统", level: 2 },
-        { id: "胰腺肿瘤", parent: "胃肠系统", level: 2 },
-        { id: "流感", parent: "感染性疾病", level: 2 },
-        { id: "结核病", parent: "感染性疾病", level: 2 },
-        { id: "HIV初次感染", parent: "感染性疾病", level: 2 },
-        { id: "重症肌无力", parent: "神经肌肉系统", level: 2 },
-        { id: "吉兰巴雷综合征", parent: "神经肌肉系统", level: 2 },
-        { id: "系统性红斑狼疮", parent: "自身免疫疾病", level: 2 },
-        { id: "过敏性休克", parent: "自身免疫疾病", level: 2 },
-        { id: "贫血", parent: "血液系统疾病", level: 2 },
-        { id: "惊恐发作", parent: "精神压力相关疾病", level: 2 },
-        { id: "LDL-C偏高", parent: "稳定型心绞痛", level: 3 },
-        { id: "胸痛放射至肩颈", parent: "不稳定型心绞痛", level: 3 },
-        { id: "心悸与节律不齐", parent: "心房颤动", level: 3 },
-        { id: "ALT升高", parent: "胃食管反流", level: 3 },
-        { id: "空腹血糖升高", parent: "系统性红斑狼疮", level: 3 }
-      ],
-      edges: []
+    let kgChart = null;
+    let selectedNode = null;
+    let currentLayout = 'force';
+    let currentFilter = 'all';
+    let searchKeyword = '';
+    
+    // 数据管理
+    const loadedNodesMap = new Map(); // 所有加载过的节点
+    const visibleNodes = new Set(); // 当前可见节点
+    const expandedNodes = new Set(); // 已展开的节点
+    const childrenCache = new Map(); // 子节点缓存，避免重复请求
+    const nodePositions = new Map(); // 节点坐标缓存
+
+    const nodeCategoryConfig = {
+      system: { color: '#4CAF50', size: 40, name: '系统' },
+      category: { color: '#03A9F4', size: 32, name: '子类' },
+      disease: { color: '#FF9800', size: 24, name: '疾病' },
+      symptom: { color: '#F44336', size: 16, name: '症状' },
+      risk_factor: { color: '#9C27B0', size: 16, name: '危险因素' },
+      therapy: { color: '#009688', size: 16, name: '治疗' }
     };
 
-    kgData.edges = kgData.nodes
-      .filter(node => node.parent)
-      .map(node => ({ source: node.parent, target: node.id }));
+    const linkTypeConfig = {
+      BELONG_TO_SYSTEM: { color: '#4CAF50', desc: '属于系统' },
+      BELONG_TO_CATEGORY: { color: '#03A9F4', desc: '属于子类' },
+      HAS_SYMPTOM: { color: '#F44336', desc: '具有症状' },
+      HAS_RISK_FACTOR: { color: '#9C27B0', desc: '危险因素' },
+      HAS_THERAPY: { color: '#009688', desc: '治疗方式' },
+      RELATED_TO: { color: '#666', desc: '相关' }
+    };
 
-    function drawKnowledgeGraph() {
-      renderKnowledgeGraph(kgData);
+    function determineLinkType(sourceNode, targetNode) {
+      const sourceType = sourceNode.node_type || sourceNode.type;
+      const targetType = targetNode.node_type || targetNode.type;
+
+      if (sourceType === 'system' && targetType === 'category') return 'BELONG_TO_SYSTEM';
+      if (sourceType === 'category' && targetType === 'disease') return 'BELONG_TO_CATEGORY';
+      if (sourceType === 'disease' && targetType === 'symptom') return 'HAS_SYMPTOM';
+      if (sourceType === 'disease' && targetType === 'risk_factor') return 'HAS_RISK_FACTOR';
+      if (sourceType === 'disease' && targetType === 'therapy') return 'HAS_THERAPY';
+
+      return 'RELATED_TO';
     }
 
-    function renderKnowledgeGraph(data) {
-      const container = document.querySelector(".kg-wrap");
-      const svgElement = qs("kgSvg");
+    function getNodeDisplayData(node) {
+      const nodeType = node.node_type || node.type || 'category';
+      const config = nodeCategoryConfig[nodeType] || nodeCategoryConfig.category;
 
-      if (!container || !svgElement || typeof d3 === "undefined") return;
+      const displayData = {
+        id: node.id,
+        name: node.name,
+        value: node.name,
+        symbolSize: config.size,
+        category: nodeType,
+        itemStyle: { color: config.color },
+        ...node
+      };
 
-      if (kgSimulation) kgSimulation.stop();
-
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-
-      const svg = d3.select(svgElement);
-      svg.selectAll("*").remove();
-
-      svg
-        .attr("width", width)
-        .attr("height", height)
-        .attr("viewBox", `0 0 ${width} ${height}`);
-
-      const zoomLayer = svg.append("g").attr("class", "kg-zoom-layer");
-      const linkLayer = zoomLayer.append("g");
-      const nodeLayer = zoomLayer.append("g");
-      const textLayer = zoomLayer.append("g");
-
-      kgZoomBehavior = d3.zoom()
-        .scaleExtent([0.35, 2.5])
-        .on("zoom", event => {
-          zoomLayer.attr("transform", event.transform);
-        });
-
-      svg.call(kgZoomBehavior);
-
-      const nodes = data.nodes.map(d => ({ ...d }));
-      const edges = data.edges.map(d => ({ ...d }));
-
-      const baseNodeSize = Math.min(70, Math.max(48, width / 24));
-      const sizeIncrement = 10;
-      const centerX = width / 2;
-      const centerY = height / 2;
-      const radiusIncrement = Math.min(width, height) / 4.25;
-
-      const root = nodes.find(n => n.level === 0);
-      if (!root) return;
-
-      root.x = centerX;
-      root.y = centerY;
-
-      function layoutChildren(parent) {
-        const children = nodes.filter(n => n.parent === parent.id);
-        if (!children.length) return;
-
-        const radius = Math.max(120, (parent.level + 1) * radiusIncrement);
-        const step = 2 * Math.PI / children.length;
-
-        children.forEach((child, i) => {
-          const angle = i * step - Math.PI / 2;
-          child.x = parent.x + radius * Math.cos(angle);
-          child.y = parent.y + radius * Math.sin(angle);
-          layoutChildren(child);
-        });
+      // 恢复缓存的坐标
+      if (nodePositions.has(node.id)) {
+        const pos = nodePositions.get(node.id);
+        displayData.x = pos.x;
+        displayData.y = pos.y;
+        displayData.fixed = true;
       }
 
-      layoutChildren(root);
-
-      kgSimulation = d3.forceSimulation(nodes)
-        .force("link", d3.forceLink(edges).id(d => d.id).distance(d => {
-          const level = d.target.level || 1;
-          if (level === 1) return 180;
-          if (level === 2) return 160;
-          return 145;
-        }).strength(0.35))
-        .force("charge", d3.forceManyBody().strength(d => d.level === 0 ? -650 : d.level === 1 ? -420 : -260))
-        .force("center", d3.forceCenter(centerX, centerY))
-        .force("collision", d3.forceCollide().radius(d => baseNodeSize - d.level * sizeIncrement + 28))
-        .alpha(0.95)
-        .restart();
-
-      const link = linkLayer.selectAll("line")
-        .data(edges)
-        .enter()
-        .append("line")
-        .attr("class", "kg-link");
-
-      const node = nodeLayer.selectAll("circle")
-        .data(nodes)
-        .enter()
-        .append("circle")
-        .attr("class", "kg-node")
-        .attr("r", d => Math.max(10, baseNodeSize - d.level * sizeIncrement - 6))
-        .attr("fill", d => {
-          if (d.level === 0) return "rgba(217,53,31,0.95)";
-          if (d.level === 1) return "rgba(255,250,240,0.88)";
-          if (d.level === 2) return "rgba(255,250,240,0.64)";
-          return "rgba(255,250,240,0.15)";
-        })
-        .attr("stroke", d => d.level === 0 ? "rgba(217,53,31,0.9)" : "rgba(20,20,22,0.42)")
-        .attr("stroke-width", d => d.level <= 1 ? 1.4 : 0.9)
-        .call(
-          d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended)
-        );
-
-      const text = textLayer.selectAll("text")
-        .data(nodes)
-        .enter()
-        .append("text")
-        .attr("class", "kg-label")
-        .style("font-size", d => d.level === 0 ? "13px" : "11px")
-        .style("fill", d => d.level === 0 ? "#fffaf2" : "#24242a")
-        .attr("dominant-baseline", "middle")
-        .attr("text-anchor", "middle")
-        .each(function(d) {
-          const el = d3.select(this);
-          splitTextForKg(d.id, d.level <= 1 ? 76 : 60).forEach((line, i, arr) => {
-            el.append("tspan")
-              .attr("x", 0)
-              .attr("dy", i === 0 ? `${-(arr.length - 1) * 6}px` : "13px")
-              .text(line);
-          });
-        });
-
-      kgSimulation.on("tick", () => {
-        nodes.forEach(d => {
-          const pad = 60;
-          d.x = Math.max(pad, Math.min(width - pad, d.x));
-          d.y = Math.max(pad, Math.min(height - pad, d.y));
-        });
-
-        link
-          .attr("x1", d => d.source.x)
-          .attr("y1", d => d.source.y)
-          .attr("x2", d => d.target.x)
-          .attr("y2", d => d.target.y);
-
-        node
-          .attr("cx", d => d.x)
-          .attr("cy", d => d.y);
-
-        text.attr("transform", d => `translate(${d.x},${d.y})`);
+      return displayData;
+    }
+    
+    function applyLODToNodes(nodes, zoomLevel) {
+      // 根据缩放级别调整节点的可见性和标签显示
+      return nodes.map(node => {
+        const nodeType = node.node_type || node.type;
+        const displayNode = { ...node };
+        
+        // LOD规则：
+        // 1. 默认所有节点都可见
+        // 2. 标签始终显示
+        
+        if (!displayNode.label) displayNode.label = {};
+        displayNode.label.show = true;
+        
+        return displayNode;
       });
-
-      svg.transition()
-        .duration(450)
-        .call(
-          kgZoomBehavior.transform,
-          d3.zoomIdentity.translate(width * 0.02, height * 0.02).scale(0.94)
-        );
-
-      function dragstarted(event, d) {
-        if (!event.active) kgSimulation.alphaTarget(0.25).restart();
-        d.fx = d.x;
-        d.fy = d.y;
+    }
+    
+    let currentVisibleTypes = new Set(['system', 'category', 'disease', 'symptom', 'risk_factor', 'therapy']);
+    
+    function updateLODByZoom(zoom) {
+      // LOD显示规则：
+      // - 默认/缩小后：显示系统、子类、疾病
+      // - 放大到一定程度：显示症状
+      // - 进一步放大：显示治疗
+      // - 继续放大：显示危险因素
+      
+      let newVisibleTypes = new Set(['system', 'category', 'disease']);
+      
+      if (zoom > 1.5) {
+        newVisibleTypes.add('symptom');
       }
-
-      function dragged(event, d) {
-        d.fx = event.x;
-        d.fy = event.y;
+      
+      if (zoom > 2) {
+        newVisibleTypes.add('therapy');
       }
-
-      function dragended(event, d) {
-        if (!event.active) kgSimulation.alphaTarget(0);
-        d.fx = null;
-        d.fy = null;
+      
+      if (zoom > 2.5) {
+        newVisibleTypes.add('risk_factor');
+      }
+      
+      // 检查是否有变化
+      let hasChange = newVisibleTypes.size !== currentVisibleTypes.size;
+      if (!hasChange) {
+        for (const type of newVisibleTypes) {
+          if (!currentVisibleTypes.has(type)) {
+            hasChange = true;
+            break;
+          }
+        }
+      }
+      
+      if (hasChange) {
+        currentVisibleTypes = newVisibleTypes;
+        
+        // 根据新的LOD规则更新可见节点
+        const newVisibleNodes = new Set();
+        visibleNodes.forEach(nodeId => {
+          const node = loadedNodesMap.get(nodeId);
+          if (node) {
+            const nodeType = node.node_type || node.type;
+            // 只隐藏但不删除已经展开的子节点
+            if (newVisibleTypes.has(nodeType) || !isLeafNode(node)) {
+              newVisibleNodes.add(nodeId);
+            }
+          }
+        });
+        
+        // 更新visibleNodes
+        visibleNodes.clear();
+        newVisibleNodes.forEach(id => visibleNodes.add(id));
+        renderGraph();
       }
     }
-
-    function resetKgView() {
-      const svgElement = qs("kgSvg");
-      if (!svgElement || !kgZoomBehavior) return;
-
-      const container = document.querySelector(".kg-wrap");
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-
-      d3.select(svgElement)
-        .transition()
-        .duration(450)
-        .call(
-          kgZoomBehavior.transform,
-          d3.zoomIdentity.translate(width * 0.02, height * 0.02).scale(0.94)
-        );
+    
+    function isLeafNode(node) {
+      const children = childrenCache.get(node.id) || [];
+      return children.length === 0;
     }
 
-    function splitTextForKg(text, maxLength) {
-      const ctx = document.createElement("canvas").getContext("2d");
-      ctx.font = "11px DM Sans, Noto Serif SC, Arial";
+    function getLinkDisplayData(link, nodesMap) {
+      const sourceNode = nodesMap[link.source];
+      const targetNode = nodesMap[link.target];
+      let linkType = link.type || determineLinkType(sourceNode || {}, targetNode || {});
+      const config = linkTypeConfig[linkType] || linkTypeConfig.RELATED_TO;
 
-      const chars = String(text).split("");
-      const lines = [];
-      let currentLine = "";
+      return {
+        source: link.source,
+        target: link.target,
+        type: linkType,
+        lineStyle: { color: config.color, width: 2, curveness: 0.2 },
+        ...link
+      };
+    }
 
-      chars.forEach(char => {
-        const testLine = currentLine + char;
-        const width = ctx.measureText(testLine).width;
+    function prepareEchartsOption() {
+      const nodesMap = {};
+      const nodes = [];
+      const links = [];
 
-        if (width < maxLength) {
-          currentLine = testLine;
-        } else {
-          if (currentLine) lines.push(currentLine);
-          currentLine = char;
+      visibleNodes.forEach(nodeId => {
+        const node = loadedNodesMap.get(nodeId);
+        if (node) {
+          nodes.push(node);
+          nodesMap[nodeId] = node;
         }
       });
 
-      if (currentLine) lines.push(currentLine);
-      return lines.slice(0, 3);
+      // 只包含可见节点之间的连接
+      nodes.forEach(node => {
+        if (node._parentId && visibleNodes.has(node._parentId)) {
+          links.push({
+            source: node._parentId,
+            target: node.id
+          });
+        }
+      });
+
+      const echartsNodes = nodes.map(getNodeDisplayData);
+      const echartsLinks = links.map(link => getLinkDisplayData(link, nodesMap));
+
+      const categories = Object.keys(nodeCategoryConfig).map(key => ({
+        name: nodeCategoryConfig[key].name
+      }));
+
+      let layoutOption = {};
+      if (currentLayout === 'force') {
+        layoutOption = {
+          layout: 'force',
+          force: {
+            repulsion: 800,
+            gravity: 0.08,
+            edgeLength: 150,
+            layoutAnimation: false, // 关闭布局动画，让节点不动
+            friction: 0.6 // 增加摩擦力，让节点更快稳定
+          }
+        };
+      } else if (currentLayout === 'circular') {
+        layoutOption = { layout: 'circular', circular: { rotateLabel: true } };
+      } else if (currentLayout === 'tree') {
+        layoutOption = { layout: 'none' };
+      }
+
+      return {
+        tooltip: {
+          formatter: function(params) {
+            if (params.dataType === 'edge') {
+              const linkType = params.data.type;
+              const config = linkTypeConfig[linkType] || linkTypeConfig.RELATED_TO;
+              return `${params.data.source} → ${params.data.target}<br/>关系: ${config.desc}`;
+            } else {
+              let html = `<strong>${params.name}</strong>`;
+              const node = params.data;
+              const nodeType = node.node_type || node.type;
+              const config = nodeCategoryConfig[nodeType];
+              if (config) html += `<br/>分类: ${config.name}`;
+              if (node.english) html += `<br/>英文: ${node.english}`;
+              if (node.description) html += `<br/>描述: ${node.description}`;
+              return html;
+            }
+          },
+          enterable: true,
+          backgroundColor: 'rgba(255, 250, 240, 0.95)',
+          borderColor: 'rgba(20,20,22,0.12)',
+          textStyle: { color: '#141416' }
+        },
+        legend: [{
+          data: categories.map(c => c.name),
+          bottom: 10,
+          right: 10,
+          textStyle: { fontSize: 12 }
+        }],
+        series: [{
+          type: 'graph',
+          layout: currentLayout,
+          data: echartsNodes,
+          links: echartsLinks,
+          categories,
+          roam: true,
+          draggable: true,
+          focusNodeAdjacency: true,
+          animation: false, // 关闭动画，提升性能
+          progressive: 2000, // 增加步长，优化大数据量
+          large: true,
+          animationThreshold: 10000,
+          ...layoutOption,
+          label: {
+            show: true, // 始终显示
+            position: 'right',
+            formatter: '{b}',
+            fontSize: 12
+          },
+          lineStyle: {
+            color: 'source',
+            curveness: 0.2,
+            width: 2
+          },
+          emphasis: {
+            focus: 'adjacency',
+            lineStyle: { width: 4 },
+            label: { show: true }
+          }
+        }]
+      };
     }
 
-    function downloadKnowledgeGraphSvg() {
-      const svgNode = qs("kgSvg");
-      if (!svgNode) return;
+    function renderGraph() {
+      const option = prepareEchartsOption();
+      // 使用增量更新而不是完全重绘，提升性能
+      kgChart.setOption(option, { 
+        notMerge: false,  // 不合并，保持增量
+        lazyUpdate: true  // 启用懒更新，只在必要时重绘
+      });
+      updateStatusText();
+    }
 
-      const serializer = new XMLSerializer();
-      const source = serializer.serializeToString(svgNode);
-      const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
+    function updateStatusText() {
+      const status = `已显示 ${visibleNodes.size} 个节点`;
+      qs("kgPanelContent").textContent = status;
+    }
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "medical-knowledge-graph.svg";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+    async function drawKnowledgeGraph() {
+      const container = qs("kgEcharts");
+      if (!container || typeof echarts === "undefined") return;
 
-      URL.revokeObjectURL(url);
+      if (!kgChart) {
+        kgChart = echarts.init(container);
+        setupKgEventListeners();
+      }
+
+      try {
+        await loadRootNodes();
+      } catch (e) {
+        console.warn("使用演示数据");
+        useDemoData();
+      }
+
+      renderGraph();
+    }
+
+    async function loadRootNodes() {
+      try {
+        const res = await apiFetch('/graph/root');
+        if (!res.ok) throw new Error('API error');
+
+        const data = await res.json();
+        if (data.code === 0 && data.data) {
+          // 添加根节点
+          data.data.forEach(node => {
+            loadedNodesMap.set(node.id, node);
+            visibleNodes.add(node.id);
+          });
+        } else {
+          throw new Error('Data error');
+        }
+      } catch (e) {
+        throw e;
+      }
+    }
+
+    async function loadChildren(parentNode) {
+      const parentId = parentNode.id;
+      
+      // 检查缓存
+      if (childrenCache.has(parentId)) {
+        return childrenCache.get(parentId);
+      }
+
+      try {
+        const res = await apiFetch(`/graph/children/${parentId}`);
+        if (!res.ok) throw new Error('API error');
+
+        const data = await res.json();
+        if (data.code === 0 && data.data) {
+          // 添加父子关系引用
+          const children = data.data.map(child => ({
+            ...child,
+            _parentId: parentId
+          }));
+          
+          // 缓存子节点
+          childrenCache.set(parentId, children);
+          
+          return children;
+        } else {
+          throw new Error('Data error');
+        }
+      } catch (e) {
+        throw e;
+      }
+    }
+
+    async function expandNode(nodeId) {
+      if (expandedNodes.has(nodeId)) return;
+      
+      const node = loadedNodesMap.get(nodeId);
+      if (!node) return;
+
+      try {
+        const children = await loadChildren(node);
+        
+        // 添加子节点
+        children.forEach(child => {
+          if (!loadedNodesMap.has(child.id)) {
+            loadedNodesMap.set(child.id, child);
+          }
+          visibleNodes.add(child.id);
+        });
+
+        expandedNodes.add(nodeId);
+        renderGraph();
+
+      } catch (e) {
+        console.error('展开节点失败', e);
+      }
+    }
+
+    function collapseNode(nodeId) {
+      if (!expandedNodes.has(nodeId)) return;
+
+      // 递归收集需要删除的节点
+      const nodesToRemove = new Set();
+      function collectDescendants(currentId) {
+        const children = childrenCache.get(currentId) || [];
+        children.forEach(child => {
+          if (!nodesToRemove.has(child.id)) {
+            nodesToRemove.add(child.id);
+            collectDescendants(child.id);
+            expandedNodes.delete(child.id);
+          }
+        });
+      }
+      
+      collectDescendants(nodeId);
+      
+      // 删除节点
+      nodesToRemove.forEach(id => {
+        visibleNodes.delete(id);
+      });
+      
+      expandedNodes.delete(nodeId);
+      renderGraph();
+    }
+
+    async function toggleExpand(nodeId) {
+      if (expandedNodes.has(nodeId)) {
+        collapseNode(nodeId);
+      } else {
+        await expandNode(nodeId);
+      }
+    }
+
+    async function showNodeDetail(node) {
+      try {
+        const res = await apiFetch(`/graph/detail/${node.id}`);
+        if (!res.ok) throw new Error('API error');
+
+        const data = await res.json();
+        if (data.code === 0 && data.data) {
+          const detail = data.data;
+          let html = `<strong>${detail.node.name}</strong>`;
+          if (detail.node.english) html += `<br/>英文: ${detail.node.english}`;
+          const nodeType = detail.node.node_type || detail.node.type;
+          const config = nodeCategoryConfig[nodeType];
+          if (config) html += `<br/>分类: ${config.name}`;
+          if (detail.node.level) html += `<br/>层级: ${detail.node.level}`;
+          if (detail.node.description) html += `<br/>描述: ${detail.node.description}`;
+          html += `<br/>子节点: ${detail.child_count} 个`;
+          html += `<br/>关联关系: ${detail.relation_count} 条`;
+
+          qs("kgPanelContent").innerHTML = html;
+          qs("kgNodeActions").style.display = 'flex';
+        }
+      } catch (e) {
+        // 如果API失败，使用已有数据
+        let html = `<strong>${node.name}</strong>`;
+        if (node.english) html += `<br/>英文: ${node.english}`;
+        const nodeType = node.node_type || node.type;
+        const config = nodeCategoryConfig[nodeType];
+        if (config) html += `<br/>分类: ${config.name}`;
+        if (node.level) html += `<br/>层级: ${node.level}`;
+        if (node.description) html += `<br/>描述: ${node.description}`;
+
+        qs("kgPanelContent").innerHTML = html;
+        qs("kgNodeActions").style.display = 'flex';
+      }
+    }
+
+    function useDemoData() {
+      const rootNodes = [
+        { id: "S001", name: "心血管系统", node_type: "system", category: "系统", level: 1 }
+      ];
+      
+      rootNodes.forEach(node => {
+        loadedNodesMap.set(node.id, node);
+        visibleNodes.add(node.id);
+      });
+
+      // 添加演示子节点
+      childrenCache.set("S001", [
+        { id: "C001", name: "心血管疾病", node_type: "category", category: "子类", level: 2, _parentId: "S001" }
+      ]);
+
+      childrenCache.set("C001", [
+        { id: "D001", name: "高血压", node_type: "disease", category: "疾病", level: 3, english: "Hypertension", description: "动脉血压持续升高的一种慢性疾病", _parentId: "C001" },
+        { id: "D002", name: "冠心病", node_type: "disease", category: "疾病", level: 3, english: "Coronary Heart Disease", description: "冠状动脉粥样硬化导致的心脏病", _parentId: "C001" }
+      ]);
+
+      childrenCache.set("D001", [
+        { id: "S003", name: "头痛", node_type: "symptom", category: "症状", level: 4, _parentId: "D001" },
+        { id: "R001", name: "高盐饮食", node_type: "risk_factor", category: "危险因素", level: 4, _parentId: "D001" },
+        { id: "T001", name: "降压药物", node_type: "therapy", category: "治疗", level: 4, _parentId: "D001" }
+      ]);
+
+      childrenCache.set("D002", [
+        { id: "S004", name: "胸痛", node_type: "symptom", category: "症状", level: 4, _parentId: "D002" },
+        { id: "R002", name: "吸烟", node_type: "risk_factor", category: "危险因素", level: 4, _parentId: "D002" },
+        { id: "T002", name: "支架植入", node_type: "therapy", category: "治疗", level: 4, _parentId: "D002" }
+      ]);
+    }
+
+    function setupKgEventListeners() {
+      kgChart.on('click', async function(params) {
+        if (params.dataType === 'node') {
+          selectedNode = params.data;
+          
+          // 点击即展开/收起
+          await toggleExpand(params.data.id);
+          
+          // 显示详情
+          await showNodeDetail(params.data);
+        }
+      });
+
+      kgChart.on('dblClick', async function(params) {
+        if (params.dataType === 'node') {
+          // 双击疾病节点展开所有关联
+          const nodeType = params.data.node_type || params.data.type;
+          if (nodeType === 'disease') {
+            await expandNode(params.data.id);
+          }
+        }
+      });
+
+      // 监听节点位置变化，缓存坐标
+      kgChart.on('rendered', function() {
+        const seriesOption = kgChart.getOption().series[0];
+        if (seriesOption && seriesOption.data) {
+          seriesOption.data.forEach(node => {
+            // 保存所有节点的位置
+            if (node.x !== undefined && node.y !== undefined) {
+              nodePositions.set(node.id, { x: node.x, y: node.y });
+            }
+          });
+        }
+      });
+      
+      // 当布局完成后，立即保存所有位置
+      kgChart.on('finished', function() {
+        const seriesOption = kgChart.getOption().series[0];
+        if (seriesOption && seriesOption.data) {
+          seriesOption.data.forEach(node => {
+            if (node.x !== undefined && node.y !== undefined) {
+              nodePositions.set(node.id, { x: node.x, y: node.y });
+            }
+          });
+        }
+      });
+
+      // 监听缩放，实现LOD（Level of Detail）显示
+      kgChart.getZr().on('zoom', function() {
+        const zoom = kgChart.getZr().transform.scale[0];
+        updateLODByZoom(zoom);
+      });
+      
+      // 监听pan事件
+      kgChart.getZr().on('pan', function() {
+        const zoom = kgChart.getZr().transform.scale[0];
+        updateLODByZoom(zoom);
+      });
+
+      kgChart.getZr().on('contextmenu', function(params) {
+        params.event.preventDefault();
+        const pointInPixel = [params.offsetX, params.offsetY];
+        if (kgChart.containPixel('grid', pointInPixel)) {
+          const target = kgChart.getZr().handler.findPoint(pointInPixel);
+          if (target && target.target) {
+            const element = target.target;
+            const id = element.__ecComponentInfo?.id;
+            if (id !== undefined) {
+              showContextMenu(params.event.offsetX, params.event.offsetY);
+            }
+          }
+        }
+      });
+
+      document.addEventListener('click', function() {
+        hideContextMenu();
+      });
+
+      qs("ctxViewDetail").addEventListener('click', async function() {
+        if (selectedNode) await showNodeDetail(selectedNode);
+        hideContextMenu();
+      });
+
+      qs("ctxExpandNeighbors").addEventListener('click', async function() {
+        if (selectedNode) await expandNode(selectedNode.id);
+        hideContextMenu();
+      });
+
+      qs("ctxCollapseNeighbors").addEventListener('click', function() {
+        if (selectedNode) collapseNode(selectedNode.id);
+        hideContextMenu();
+      });
+
+      qs("ctxCopyName").addEventListener('click', function() {
+        if (selectedNode) copyToClipboard(selectedNode.name);
+        hideContextMenu();
+      });
+
+      qs("kgExpandNeighbors").addEventListener('click', async function() {
+        if (selectedNode) await expandNode(selectedNode.id);
+      });
+
+      qs("kgCollapseNeighbors").addEventListener('click', function() {
+        if (selectedNode) collapseNode(selectedNode.id);
+      });
+
+      qs("kgCopyName").addEventListener('click', function() {
+        if (selectedNode) copyToClipboard(selectedNode.name);
+      });
+
+      qs("kgFilterSelect").addEventListener('change', function(e) {
+        currentFilter = e.target.value;
+        applyFilter();
+      });
+
+      qs("kgLayoutSelect").addEventListener('change', function(e) {
+        currentLayout = e.target.value;
+        renderGraph();
+      });
+      
+      qs("kgExpandToLevel").addEventListener('change', async function(e) {
+        const level = parseInt(e.target.value);
+        await expandToLevel(level);
+      });
+      
+      qs("kgExpandAll").addEventListener('click', async function() {
+        await expandToLevel(2);
+      });
+
+      qs("kgSearchInput").addEventListener('input', async function(e) {
+        searchKeyword = e.target.value.trim();
+        if (searchKeyword) {
+          await performSearch(searchKeyword);
+        }
+      });
+
+      qs("kgZoomIn").addEventListener('click', function() {
+        kgChart.dispatchAction({ type: 'restore' });
+        const current = kgChart.getOption();
+        const zr = kgChart.getZr();
+        zr.transform = {
+          scale: [zr.transform.scale[0] * 1.2, zr.transform.scale[1] * 1.2],
+          position: zr.transform.position
+        };
+      });
+
+      qs("kgZoomOut").addEventListener('click', function() {
+        const zr = kgChart.getZr();
+        zr.transform = {
+          scale: [zr.transform.scale[0] / 1.2, zr.transform.scale[1] / 1.2],
+          position: zr.transform.position
+        };
+      });
+
+      qs("kgReset").addEventListener('click', function() {
+        resetGraph();
+      });
+
+      qs("kgFitView").addEventListener('click', function() {
+        fitGraphView();
+      });
+
+      qs("kgExport").addEventListener('click', function() {
+        exportGraphAsPng();
+      });
+
+      window.addEventListener('resize', function() {
+        if (kgChart) kgChart.resize();
+      });
+    }
+
+    async function performSearch(keyword) {
+      try {
+        const res = await apiFetch(`/graph/search?keyword=${encodeURIComponent(keyword)}`);
+        if (!res.ok) throw new Error('Search error');
+
+        const data = await res.json();
+        if (data.code === 0 && data.data && data.data.length > 0) {
+          const searchResult = data.data[0];
+          
+          // 展开父链
+          if (searchResult.parent_chain_ids) {
+            for (const parentId of searchResult.parent_chain_ids) {
+              if (!expandedNodes.has(parentId)) {
+                await expandNode(parentId);
+              }
+            }
+          }
+
+          // 定位到目标节点
+          focusOnNode(searchResult.node.id);
+        }
+      } catch (e) {
+        console.error('搜索失败', e);
+      }
+    }
+
+    function focusOnNode(nodeId) {
+      if (!kgChart) return;
+      
+      // 高亮显示节点
+      kgChart.dispatchAction({
+        type: 'focusNodeAdjacency',
+        seriesIndex: 0,
+        dataIndex: nodeId
+      });
+    }
+    
+    async function expandToLevel(targetLevel) {
+      // 先重置，确保从根节点开始
+      await resetGraphInternal();
+      
+      // 禁用临时渲染
+      let renderDisabled = true;
+      
+      async function expandLevel(currentLevel) {
+        if (currentLevel > targetLevel) return;
+        
+        // 获取当前级别的节点
+        const currentNodes = Array.from(visibleNodes).filter(id => {
+          const node = loadedNodesMap.get(id);
+          return node && node.level === currentLevel;
+        });
+        
+        // 批量展开所有节点
+        for (const nodeId of currentNodes) {
+          // 不等待每个展开完成，同时加载所有子节点
+          loadChildrenWithoutExpanding(nodeId);
+        }
+        
+        // 等待一小段时间让请求完成
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // 然后统一添加
+        for (const nodeId of currentNodes) {
+          await expandNodeWithoutRender(nodeId);
+        }
+        
+        // 只在最后渲染一次
+        if (currentLevel === targetLevel) {
+          renderDisabled = false;
+          renderGraph();
+        } else {
+          await expandLevel(currentLevel + 1);
+        }
+      }
+      
+      await expandLevel(1);
+    }
+    
+    async function expandAll() {
+      // 展开所有节点到最底层
+      await expandToLevel(4);
+    }
+    
+    // 预加载子节点，但不立即展开
+    async function loadChildrenWithoutExpanding(parentId) {
+      const node = loadedNodesMap.get(parentId);
+      if (!node) return;
+      if (childrenCache.has(parentId)) return;
+      
+      try {
+        await loadChildren(node);
+      } catch (e) {
+        console.error('预加载失败', e);
+      }
+    }
+    
+    // 展开节点但不渲染
+    async function expandNodeWithoutRender(nodeId) {
+      if (expandedNodes.has(nodeId)) return;
+      
+      const node = loadedNodesMap.get(nodeId);
+      if (!node) return;
+      
+      try {
+        const children = childrenCache.get(nodeId) || await loadChildren(node);
+        
+        // 添加子节点到可见列表
+        children.forEach(child => {
+          if (!loadedNodesMap.has(child.id)) {
+            loadedNodesMap.set(child.id, child);
+          }
+          visibleNodes.add(child.id);
+        });
+        
+        expandedNodes.add(nodeId);
+      } catch (e) {
+        console.error('展开节点失败', e);
+      }
+    }
+    
+    async function resetGraphInternal() {
+      // 内部重置函数
+      loadedNodesMap.clear();
+      visibleNodes.clear();
+      expandedNodes.clear();
+      
+      await loadRootNodes();
+      renderGraph();
+    }
+
+    function applyFilter() {
+      if (currentFilter === 'all') {
+        // 恢复所有已加载的根节点和已展开的节点
+        // 这里简化处理
+        renderGraph();
+        return;
+      }
+
+      // 只显示特定类型的节点
+      const filteredNodes = new Set();
+      
+      visibleNodes.forEach(nodeId => {
+        const node = loadedNodesMap.get(nodeId);
+        if (node) {
+          const nodeType = node.node_type || node.type;
+          if (nodeType === currentFilter) {
+            filteredNodes.add(nodeId);
+          }
+        }
+      });
+      
+      // 临时替换visibleNodes用于渲染
+      const originalVisibleNodes = new Set(visibleNodes);
+      visibleNodes.clear();
+      filteredNodes.forEach(id => visibleNodes.add(id));
+      
+      renderGraph();
+      
+      // 恢复原始集合，避免状态丢失
+      visibleNodes.clear();
+      originalVisibleNodes.forEach(id => visibleNodes.add(id));
+    }
+
+    function resetGraph() {
+      loadedNodesMap.clear();
+      visibleNodes.clear();
+      expandedNodes.clear();
+      childrenCache.clear();
+      nodePositions.clear();
+      currentVisibleTypes = new Set(['system', 'category', 'disease', 'symptom', 'risk_factor', 'therapy']);
+      
+      currentFilter = 'all';
+      currentLayout = 'force';
+      searchKeyword = '';
+      qs("kgFilterSelect").value = 'all';
+      qs("kgLayoutSelect").value = 'force';
+      qs("kgExpandToLevel").value = '1';
+      qs("kgSearchInput").value = '';
+      
+      selectedNode = null;
+      qs("kgNodeActions").style.display = 'none';
+      
+      loadRootNodes().then(() => {
+        renderGraph();
+      });
+    }
+
+    function fitGraphView() {
+      if (kgChart) {
+        kgChart.resize();
+      }
+    }
+
+    function exportGraphAsPng() {
+      if (kgChart) {
+        const url = kgChart.getDataURL({
+          type: 'png',
+          pixelRatio: 2,
+          backgroundColor: '#f5efe2'
+        });
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'medical-knowledge-graph.png';
+        a.click();
+      }
+    }
+
+    function showContextMenu(x, y) {
+      const menu = qs("kgContextMenu");
+      menu.style.display = 'block';
+      menu.style.left = x + 'px';
+      menu.style.top = y + 'px';
+    }
+
+    function hideContextMenu() {
+      const menu = qs("kgContextMenu");
+      menu.style.display = 'none';
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('已复制: ' + text);
+      }).catch(() => {
+        alert('复制失败');
+      });
     }
 
     function enterApp() {
@@ -3280,8 +3933,6 @@
     qs("deleteConvBtn").addEventListener("click", deleteConversation);
     qs("sendBtn").addEventListener("click", sendMessage);
     qs("copyJsonBtn").addEventListener("click", copyJson);
-    qs("downloadKgBtn").addEventListener("click", downloadKnowledgeGraphSvg);
-    qs("fitKgBtn").addEventListener("click", resetKgView);
 
     qs("fileInput").addEventListener("change", event => {
       selectedFile = event.target.files[0] || null;
@@ -3298,7 +3949,9 @@
       const kgPage = qs("page-kg");
       if (kgPage && kgPage.classList.contains("active")) {
         clearTimeout(window.__kgResizeTimer);
-        window.__kgResizeTimer = setTimeout(drawKnowledgeGraph, 180);
+        window.__kgResizeTimer = setTimeout(() => {
+          if (kgChart) kgChart.resize();
+        }, 180);
       }
     });
 
