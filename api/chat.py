@@ -887,6 +887,9 @@ async def chat(
             user_text=text
         )
 
+        # 保存原始识别结果用于前端展示“结构化 JSON”
+        final_json["extracted_raw"] = parsed_json
+
         report_result = await call_report_api(final_json)
 
         if report_result is not None:

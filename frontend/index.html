@@ -2093,6 +2093,11 @@
     function buildStructuredJson(raw) {
       const result = unwrapResult(raw);
 
+      // 优先使用原始识别结果（传给外部接口前的纯识别数据）
+      if (result.extracted_raw && typeof result.extracted_raw === "object") {
+        return result.extracted_raw;
+      }
+
       if (!result || typeof result !== "object") {
         return {};
       }
