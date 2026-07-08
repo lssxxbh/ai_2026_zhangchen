@@ -1,17 +1,29 @@
 import json
 import re
+import uuid
 from pathlib import Path
 from typing import Optional, Any, Dict, List
 from datetime import datetime
 
 import httpx
-from fastapi import APIRouter, Depends, UploadFile, File, Form
+from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 from database import get_db
 from models import User
-from models.chat_message import MessageRole
+from models.chat_message import MessageRole, ChatMessage
 from schemas.chat import ChatResponse
+from schemas.report import (
+    Visualization,
+    Summary,
+    Indicator,
+    Agent,
+    SimilarCase,
+    KnowledgeGraphItem,
+    KnowledgeItem,
+    Recommendation
+)
 from api.deps import get_current_user
 from services import (
     OCRService,
@@ -136,6 +148,7 @@ def normalize_indicator_item(item: Any) -> Dict[str, Any]:
 def normalize_indicators(result: Dict[str, Any]) -> List[Dict[str, Any]]:
     indicators = (
         result.get("indicators")
+        or result.get("laboratory")
         or result.get("metrics")
         or result.get("items")
         or result.get("structured_data")
@@ -305,7 +318,7 @@ def build_advice_from_indicators(indicators: List[Dict[str, Any]]) -> List[Dict[
         advice.append(
             {
                 "title": "综合健康建议",
-                "content": "请结合体检指标、既往病史和当前症状综合判断。若存在持续异常或明显不适，应及时前往医疗机构就诊。",
+                "content": "请结合体检指标、既往病史和临床症状综合判断。若存在持续异常或明显不适，应及时前往医疗机构就诊。",
                 "tags": ["综合建议"]
             }
         )
@@ -454,6 +467,120 @@ def normalize_advice(result: Dict[str, Any], indicators: List[Dict[str, Any]]) -
 
     return build_advice_from_indicators(indicators)
 
+
+def build_visualization(final_json: Dict[str, Any]) -> Optional[Visualization]:
+    try:
+        # Extract summary
+        summary_data = final_json.get("summary", {})
+        
+        risk_level = final_json.get("risk_level")
+        
+        # Ensure summary_data is a dictionary
+        if not isinstance(summary_data, dict):
+            # If summary is a string, treat it as the diagnosis text and provide defaults for other fields
+            summary_data = {"diagnosis": summary_data, "title": "医疗检测报告", "risk_level": risk_level or "N/A", "confidence": 0.0, "reason": "N/A", "health_score": 0}
+            
+        health_score = summary_data.get("health_score") or 0
+        if not health_score:
+            if risk_level == "高风险":
+                health_score = 60
+            elif risk_level == "中高风险":
+                health_score = 70
+            elif risk_level == "中等风险":
+                health_score = 80
+            elif risk_level == "低风险":
+                health_score = 90
+            else:
+                health_score = 85 # Default if no risk level or cannot infer
+
+        summary = Summary(
+            title=summary_data.get("title", "医疗检测报告"),
+            diagnosis=summary_data.get("diagnosis", final_json.get("summary", "N/A")),
+            risk_level=summary_data.get("risk_level", risk_level or "N/A"),
+            confidence=float(summary_data.get("confidence", 0.0)),
+            reason=summary_data.get("reason", "N/A"),
+            health_score=health_score
+        )
+
+        # Extract indicators
+        indicators = []
+        for item in final_json.get("indicators", []):
+            if isinstance(item, dict):
+                indicators.append(Indicator(
+                    name=item.get("name", "N/A"),
+                    abbreviation=item.get("abbreviation", "N/A"),
+                    value=float(item.get("value", 0)) if str(item.get("value", "0")).replace('.', '', 1).isdigit() else 0.0,
+                    unit=item.get("unit", "N/A"),
+                    reference=item.get("reference", "N/A"),
+                    status=item.get("status", "N/A")
+                ))
+
+        # Extract agents
+        agents = []
+        for item in final_json.get("agents", []):
+            if isinstance(item, dict):
+                agents.append(Agent(
+                    department=item.get("name", "N/A"),
+                    risk_level=item.get("risk_level", "N/A"),
+                    confidence=float(item.get("confidence", 0)),
+                    summary=item.get("conclusion", "N/A"),
+                    recommendation=item.get("recommendation", [])
+                ))
+
+        # Extract similar cases
+        similar_cases = []
+        for item in final_json.get("similar_cases", []):
+            if isinstance(item, dict):
+                similar_cases.append(SimilarCase(
+                    case_id=item.get("case_id", "N/A"),
+                    disease=item.get("disease", "N/A"),
+                    similarity=float(item.get("similarity", 0))
+                ))
+
+        # Extract knowledge graph
+        knowledge_graph = []
+        for item in final_json.get("knowledge_graph", []):
+            if isinstance(item, dict):
+                knowledge_graph.append(KnowledgeGraphItem(
+                    disease=item.get("disease", "N/A"),
+                    relation=item.get("relation", "N/A"),
+                    entity=item.get("entity", "N/A"),
+                    value=item.get("value", "N/A")
+                ))
+
+        # Extract knowledge
+        knowledge = []
+        for item in final_json.get("knowledge", []):
+            if isinstance(item, dict):
+                knowledge.append(KnowledgeItem(
+                    source=item.get("source", "N/A"),
+                    content=item.get("content", "N/A")
+                ))
+
+        # Extract recommendation
+        recommendation_data = final_json.get("recommendation", {})
+        recommendation = Recommendation(
+            diet=recommendation_data.get("diet", []),
+            exercise=recommendation_data.get("exercise", []),
+            follow_up=recommendation_data.get("follow_up", [])
+        )
+
+        # Extract warning
+        warning = final_json.get("warning", "N/A")
+
+        return Visualization(
+            summary=summary,
+            indicators=indicators,
+            agents=agents,
+            similar_cases=similar_cases,
+            knowledge_graph=knowledge_graph,
+            knowledge=knowledge,
+            recommendation=recommendation,
+            warning=warning
+        )
+    except Exception as e:
+        logger.error(f"Error building visualization: {e}", exc_info=True)
+        return None
 
 def enhance_result_for_frontend(
     parsed_json: Dict[str, Any],
@@ -715,11 +842,51 @@ def merge_report_api_result(
 
     final_json["report_api_result"] = report_result
 
+    # 优先从外部API结果中提取report_text和visualization对象
+    api_report_text = report_result.get("report_text")
+    api_visualization = report_result.get("visualization")
+
+    if api_report_text:
+        final_json["report_text"] = api_report_text # 保存外部API返回的report_text
+
+    if api_visualization and isinstance(api_visualization, dict):
+        final_json["visualization_from_api"] = api_visualization # 保存外部API返回的完整visualization对象
+
+        # 从visualization对象中提取字段并更新final_json
+        vis_summary = api_visualization.get("summary")
+        if vis_summary:
+            final_json["summary"] = vis_summary
+            # 从visualization.summary中提取risk_level和health_score
+            if isinstance(vis_summary, dict):
+                if "risk_level" in vis_summary:
+                    final_json["risk_level"] = vis_summary["risk_level"]
+                if "health_score" in vis_summary:
+                    final_json["health_score"] = vis_summary["health_score"]
+
+        vis_indicators = api_visualization.get("indicators")
+        if vis_indicators:
+            final_json["indicators"] = normalize_indicators({"indicators": vis_indicators}) # 确保经过normalize
+
+        vis_agents = api_visualization.get("agents")
+        if vis_agents:
+            # normalize_agents需要原始final_json的indicators，这里提供一个空的或已有的
+            final_json["agents"] = normalize_agents({"agents": vis_agents}, final_json.get("indicators", []))
+
+        vis_advice = api_visualization.get("recommendation") # 外部API返回的推荐可能在"recommendation"
+        if vis_advice:
+            final_json["advice"] = normalize_advice({"advice": vis_advice}, final_json.get("indicators", []))
+            
+        vis_critique = api_visualization.get("critique")
+        if vis_critique:
+            final_json["critique"] = normalize_critique({"critique": vis_critique})
+
+    # Fallback to top-level data if visualization not used or incomplete (for older API versions)
     data = report_result.get("data") if isinstance(report_result.get("data"), dict) else report_result
 
     if not isinstance(data, dict):
         return final_json
 
+    # 现有逻辑保持不变，作为补充或兼容老版本
     report_summary = (
         data.get("summary")
         or data.get("report_summary")
@@ -728,8 +895,7 @@ def merge_report_api_result(
         or data.get("final_report")
         or data.get("report")
     )
-
-    if report_summary:
+    if report_summary and "summary" not in final_json: # 仅当final_json中尚未更新时才使用
         final_json["summary"] = report_summary
         final_json["report_summary"] = report_summary
 
@@ -739,8 +905,7 @@ def merge_report_api_result(
         or data.get("overall_risk")
         or data.get("risk_assessment")
     )
-
-    if report_risk:
+    if report_risk and "risk_level" not in final_json: # 仅当final_json中尚未更新时才使用
         final_json["risk_level"] = report_risk
 
     report_indicators = (
@@ -750,8 +915,7 @@ def merge_report_api_result(
         or data.get("structured_data")
         or data.get("extracted_indicators")
     )
-
-    if report_indicators:
+    if report_indicators and "indicators" not in final_json: # 仅当final_json中尚未更新时才使用
         temp = {"indicators": report_indicators}
         final_json["indicators"] = normalize_indicators(temp)
 
@@ -761,8 +925,7 @@ def merge_report_api_result(
         or data.get("suggestions")
         or data.get("health_advice")
     )
-
-    if report_advice:
+    if report_advice and "advice" not in final_json: # 仅当final_json中尚未更新时才使用
         final_json["advice"] = normalize_advice(
             {"advice": report_advice},
             final_json.get("indicators", [])
@@ -774,8 +937,7 @@ def merge_report_api_result(
         or data.get("multi_agent")
         or data.get("agent_results")
     )
-
-    if report_agents:
+    if report_agents and "agents" not in final_json: # 仅当final_json中尚未更新时才使用
         final_json["agents"] = normalize_agents(
             {"agents": report_agents},
             final_json.get("indicators", [])
@@ -787,8 +949,7 @@ def merge_report_api_result(
         or data.get("checks")
         or data.get("evidence")
     )
-
-    if report_critique:
+    if report_critique and "critique" not in final_json: # 仅当final_json中尚未更新时才使用
         final_json["critique"] = normalize_critique(
             {"critique": report_critique}
         )
@@ -862,9 +1023,14 @@ async def chat(
                 user_text=text
             )
 
+            if parsed_json and "ocr" in parsed_json and "source" in parsed_json["ocr"]:
+                logger.info(f"当前使用的解析器来源: {parsed_json['ocr']['source']}")
+
         elif text and text.strip():
             extracted_text = text
             parsed_json = await parser_service.parse_text(text)
+            if parsed_json and "ocr" in parsed_json and "source" in parsed_json["ocr"]:
+                logger.info(f"当前使用的解析器来源: {parsed_json['ocr']['source']}")
 
         if not parsed_json:
             parsed_json = {
@@ -890,35 +1056,145 @@ async def chat(
         # 保存原始识别结果用于前端展示“结构化 JSON”
         final_json["extracted_raw"] = parsed_json
 
+        logger.info(f"调用外部报告API前的final_json (部分): {json.dumps(final_json, ensure_ascii=False)[:500]}...")
         report_result = await call_report_api(final_json)
+        logger.info(f"外部报告API返回结果 (部分): {json.dumps(report_result, ensure_ascii=False)[:500]}...")
 
         if report_result is not None:
             final_json = merge_report_api_result(
                 final_json=final_json,
                 report_result=report_result
             )
+            logger.info(f"合并外部报告API结果后的final_json (部分): {json.dumps(final_json, ensure_ascii=False)[:500]}...")
 
+        report_id = None
+        has_report = False
+        visualization_obj = None
+
+        if final_json:
+            visualization_obj = build_visualization(final_json)
+            if visualization_obj:
+                report_id = str(uuid.uuid4())
+                has_report = True
+                
         json_str = json.dumps(final_json, ensure_ascii=False)
+        
+        # 优先使用外部API返回的report_text作为聊天消息
+        assistant_msg_content = final_json.get("report_text") or build_assistant_message(final_json)
 
-        assistant_msg = build_assistant_message(final_json)
+        # 优先使用外部API返回的visualization对象
+        api_visualization_data = final_json.get("visualization_from_api")
+        if api_visualization_data:
+            try:
+                visualization_obj = Visualization(**api_visualization_data) # 直接使用Pydantic模型解析
+            except Exception as e:
+                logger.error(f"从外部API visualization_data构建visualization_obj失败: {e}", exc_info=True)
+                visualization_obj = build_visualization(final_json) # 回退到旧逻辑
+        else:
+            visualization_obj = build_visualization(final_json)
 
         assistant_message = await conv_service.add_message(
             conv.id,
             MessageRole.ASSISTANT,
-            assistant_msg,
+            assistant_msg_content,
             json_result=json_str,
             file_name=file_name,
-            file_type=file_type
+            file_type=file_type,
+            report_id=report_id,
+            visualization_json=json.dumps(visualization_obj.model_dump(), ensure_ascii=False) if visualization_obj else None
         )
 
-        return success_response(
-            data=ChatResponse(
-                conversation_id=conv.id,
-                message_id=assistant_message.id,
-                result=final_json
-            )
-        )
+        response_data = {
+            "message": assistant_msg_content,
+            "report_id": report_id,
+            "has_report": has_report,
+            "result": final_json # 添加完整的 final_json
+        }
+
+        return success_response(data=response_data)
 
     except Exception as e:
         logger.error(f"Chat error: {e}", exc_info=True)
         return error_response(msg=str(e))
+
+
+@router.get("/report/{report_id}")
+async def get_report(
+    report_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    try:
+        # 查询数据库获取 ChatMessage 记录
+        result = await db.execute(
+            select(ChatMessage).where(
+                ChatMessage.report_id == report_id
+            )
+        )
+        chat_message = result.scalars().first()
+
+        if not chat_message:
+            raise HTTPException(status_code=404, detail="Report not found")
+
+        # 确保是 ASSISTANT 角色且属于当前用户
+        # if chat_message.role != MessageRole.ASSISTANT or chat_message.conversation.user_id != current_user.id:
+        #     raise HTTPException(status_code=403, detail="Not authorized to access this report")
+
+        visualization_data = None
+        if chat_message.visualization_json:
+            visualization_data = json.loads(chat_message.visualization_json)
+
+        return success_response(
+            data={
+                "status": "done",
+                "report_text": chat_message.message,
+                "visualization": visualization_data
+            }
+        )
+
+    except HTTPException as http_e:
+        raise http_e
+    except Exception as e:
+        logger.error(f"Error fetching report {report_id}: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/chat/{chat_id}/reports")
+async def get_chat_reports(
+    chat_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    try:
+        # 查询数据库获取当前聊天中所有带有 report_id 的 ASSISTANT 消息
+        result = await db.execute(
+            select(ChatMessage).where(
+                ChatMessage.conversation_id == chat_id,
+                ChatMessage.role == MessageRole.ASSISTANT,
+                ChatMessage.report_id.isnot(None)
+            ).order_by(ChatMessage.created_at)
+        )
+        chat_messages = result.scalars().all()
+
+        reports = []
+        for msg in chat_messages:
+            title = "医疗检测报告"
+            if msg.visualization_json:
+                try:
+                    vis_data = json.loads(msg.visualization_json)
+                    if vis_data and "summary" in vis_data and "title" in vis_data["summary"]:
+                        title = vis_data["summary"]["title"]
+                except json.JSONDecodeError:
+                    logger.warning(f"Could not decode visualization_json for message {msg.id}")
+
+            reports.append({
+                "report_id": msg.report_id,
+                "title": title,
+                "created_at": msg.created_at.isoformat()
+            })
+
+        return success_response(data=reports)
+
+    except Exception as e:
+        logger.error(f"Error fetching reports for chat {chat_id}: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")

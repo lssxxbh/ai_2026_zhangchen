@@ -49,4 +49,6 @@ class ChatMessage(Base):
     json_result = Column(Text, nullable=True)
     file_name = Column(String(255), nullable=True)
     file_type = Column(String(50), nullable=True)
+    report_id = Column(String(255), nullable=True, index=True)
+    visualization_json = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

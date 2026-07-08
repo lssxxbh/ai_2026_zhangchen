@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS conversations (
     INDEX idx_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS chat_messages;
+
 CREATE TABLE IF NOT EXISTS chat_messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     conversation_id INT NOT NULL,
@@ -27,9 +29,12 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     json_result LONGTEXT,
     file_name VARCHAR(255),
     file_type VARCHAR(50),
+    report_id VARCHAR(255),
+    visualization_json LONGTEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,
-    INDEX idx_conversation_id (conversation_id)
+    INDEX idx_conversation_id (conversation_id),
+    INDEX idx_report_id (report_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 

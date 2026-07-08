@@ -1,6 +1,6 @@
 import json
 import re
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List, Tuple
 from openai import AsyncOpenAI
 from config import settings
 from utils.logger import logger
@@ -56,6 +56,7 @@ class AIService:
             content = response.choices[0].message.content
             if content:
                 result = self._parse_json_response(content)
+                result = self._enhance_laboratory_result(result, text)
                 # 只在有文本提取时才添加 ocr 信息
                 if text:
                     result["ocr"] = {
@@ -136,17 +137,27 @@ class AIService:
 
     def _parse_json_response(self, content: str) -> Optional[Dict[str, Any]]:
         try:
+            logger.debug(f"尝试解析LLM原始输出: {content[:1000]}...") # 记录前1000字符
             json_str = content
             json_start = content.find("{")
             json_end = content.rfind("}")
             if json_start != -1 and json_end != -1:
                 json_str = content[json_start:json_end + 1]
+            
+            # 如果截取后发现不是有效的JSON，尝试修复
+            if not json_str.strip().startswith("{") or not json_str.strip().endswith("}"):
+                logger.warning("LLM输出可能包含非JSON前缀或后缀，尝试直接解析完整内容")
+                json_str = content # 恢复完整内容尝试解析
+
             result = json.loads(json_str)
             # 移除所有值为 null 或空数组的字段
             result = self._clean_empty_fields(result)
             return result
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON解析失败: {e}. 原始LLM输出: {content}", exc_info=True)
+            return {"raw_response": content}
         except Exception as e:
-            logger.error(f"JSON解析错误: {e}", exc_info=True)
+            logger.error(f"JSON解析发生未知错误: {e}. 原始LLM输出: {content}", exc_info=True)
             return {"raw_response": content}
 
     def _clean_empty_fields(self, data: Any) -> Any:
@@ -285,4 +296,170 @@ class AIService:
             result["laboratory"] = laboratory
         
         logger.info(f"本地规则解析完成")
+        return self._enhance_laboratory_result(result, text)
+
+    def _enhance_laboratory_result(self, result: Optional[Dict[str, Any]], text: str) -> Dict[str, Any]:
+        """用确定性表格解析修正血常规这类高频检验单，降低 LLM/OCR 串列错误。"""
+        if not isinstance(result, dict):
+            result = {}
+
+        parsed_labs = self._parse_blood_routine_table(text)
+        if not parsed_labs:
+            return result
+
+        existing = result.get("laboratory")
+        if not isinstance(existing, list) or len(parsed_labs) >= max(3, len(existing) // 2):
+            result["laboratory"] = parsed_labs
+            return result
+
+        by_name = {item.get("name"): item for item in existing if isinstance(item, dict)}
+        for lab in parsed_labs:
+            by_name[lab["name"]] = lab
+        result["laboratory"] = list(by_name.values())
         return result
+
+    def _parse_blood_routine_table(self, text: str) -> List[Dict[str, str]]:
+        if not text:
+            return []
+
+        specs = [
+            ("白细胞数目", ["白细胞数目", "白细胞计数", "WBC"], "10*9/L", "4-10"),
+            ("淋巴细胞数目", ["淋巴细胞数目", "#LYM"], "10*9/L", "0.8-4"),
+            ("中间细胞数目", ["中间细胞数目", "#MON"], "10*9/L", "0.1-1.2"),
+            ("中性细胞数目", ["中性细胞数目", "中性粒细胞数目", "#GRAN"], "10*9/L", "2-7"),
+            ("淋巴细胞百分比", ["淋巴细胞百分比", "%LYM"], "%", "20-40"),
+            ("中间细胞百分比", ["中间细胞百分比", "%MON"], "%", "3-14"),
+            ("中性粒细胞百分比", ["中性粒细胞百分比", "%GRAN"], "%", "50-70"),
+            ("红细胞数目", ["红细胞数目", "红细胞计数", "RBC"], "10*12/L", "3.5-5.5"),
+            ("血红蛋白", ["血红蛋白", "HGB"], "g/L", "110-160"),
+            ("红细胞压积", ["红细胞压积", "HCT"], "%", "37-54"),
+            ("平均红细胞体积", ["平均红细胞体积", "MCV"], "fL", "80-100"),
+            ("平均红细胞血红蛋白量", ["平均红细胞血红蛋白量", "平均红细胞血红蛋白里", "MCH"], "pg", "27-34"),
+            ("平均红细胞血红蛋白浓度", ["平均红细胞血红蛋白浓度", "MCHC"], "g/L", "320-360"),
+            ("红细胞分布宽度变异系数", ["红细胞分布宽度变异系数", "红细胞分布宽度娈异系数", "RDW-CV", "RDW-CT"], "%", "11-16"),
+            ("红细胞分布宽度标准差", ["红细胞分布宽度标准差", "RDW-SV", "RDN-ST"], "fL", "35-56"),
+            ("血小板", ["血小板", "PLT"], "10*9/L", "100-300"),
+            ("平均血小板体积", ["平均血小板体积", "MPV"], "fL", "6.5-12"),
+            ("血小板分布宽度", ["血小板分布宽度", "PDW", "PDV"], "fL", "9-17"),
+            ("血小板压积", ["血小板压积", "PCT"], "%", "0.108-0.282"),
+        ]
+
+        lines = [line.strip() for line in text.splitlines() if line.strip()]
+        parsed: List[Dict[str, str]] = []
+        used_names = set()
+
+        for name, aliases, default_unit, default_ref in specs:
+            row_index, row_text = self._find_lab_row(lines, aliases)
+            if row_index < 0 or name in used_names:
+                continue
+
+            value, reference = self._extract_lab_value_and_reference(row_text, aliases)
+            if not value:
+                window = " ".join(lines[row_index + 1: row_index + 5])
+                value, reference = self._extract_lab_value_and_reference(window, aliases)
+                if not value:
+                    tokens = self._number_like_tokens(window)
+                    value = tokens[0] if tokens else ""
+                    reference = tokens[1] if len(tokens) > 1 else ""
+            if not value:
+                continue
+
+            value = self._normalize_lab_number(value)
+            reference = self._normalize_lab_reference(reference or default_ref, default_ref)
+            flag = self._calc_lab_flag(value, reference)
+            parsed.append({
+                "name": name,
+                "value": value,
+                "unit": default_unit,
+                "reference": reference,
+                "flag": flag,
+            })
+            used_names.add(name)
+
+        return parsed if len(parsed) >= 3 else []
+
+    @staticmethod
+    def _find_lab_row(lines: List[str], aliases: List[str]) -> Tuple[int, str]:
+        chinese_aliases = [alias for alias in aliases if re.search(r"[\u4e00-\u9fff]", alias)]
+        ordered_alias_groups = [chinese_aliases, aliases]
+        seen = set()
+        for alias_group in ordered_alias_groups:
+            for index, line in enumerate(lines):
+                compact = re.sub(r"\s+", "", line).upper()
+                for alias in alias_group:
+                    key = (index, alias)
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    if alias.upper().replace(" ", "") in compact:
+                        return index, line
+        return -1, ""
+
+    def _extract_lab_value_and_reference(self, text: str, aliases: List[str]) -> Tuple[str, str]:
+        for alias in aliases:
+            pattern = re.escape(alias)
+            match = re.search(pattern + r"(?P<trailing>.*)", text, re.IGNORECASE)
+            if match:
+                tokens = self._number_like_tokens(match.group("trailing"))
+                if tokens:
+                    value = tokens[0]
+                    reference = tokens[1] if len(tokens) > 1 else ""
+                    return value, reference
+        return "", ""
+
+    @staticmethod
+    def _number_like_tokens(text: str) -> List[str]:
+        normalized = text.replace("—", "-").replace("－", "-").replace("~", "-")
+        pattern = (
+            r"(?<![A-Za-z])(?:"
+            r"\d+(?:\.\d+)?\s*-+\s*\d+(?:\.\d+)?"
+            r"|[\dTtOoIl吕GgB]+(?:\.\s*[\dTtOoIl吕GgB]+)?"
+            r")"
+        )
+        return re.findall(pattern, normalized)
+
+    @staticmethod
+    def _normalize_lab_number(value: str) -> str:
+        value = re.sub(r"\s+", "", value)
+        trans = str.maketrans({
+            "T": "7", "t": "7", "O": "0", "o": "0", "I": "1", "l": "1",
+            "吕": "8", "G": "6", "g": "6", "B": "8",
+        })
+        value = value.translate(trans)
+        return value
+
+    def _normalize_lab_reference(self, reference: str, default_ref: str) -> str:
+        reference = self._normalize_lab_number(reference).replace("--", "-")
+        reference = re.sub(r"-{2,}", "-", reference)
+        reference = reference.strip("-")
+        if not re.fullmatch(r"\d+(?:\.\d+)?-\d+(?:\.\d+)?", reference):
+            return default_ref
+        low, high = [float(x) for x in reference.split("-", 1)]
+        if low >= high:
+            return default_ref
+
+        try:
+            default_low, default_high = [float(x) for x in default_ref.split("-", 1)]
+        except Exception:
+            return reference
+
+        if high < default_high * 0.55 or high > default_high * 2.2:
+            return default_ref
+        if default_low >= 1 and (low < default_low * 0.45 or low > default_low * 2.2):
+            return default_ref
+        return reference
+
+    @staticmethod
+    def _calc_lab_flag(value: str, reference: str) -> str:
+        try:
+            number = float(value)
+            low_text, high_text = reference.split("-", 1)
+            low = float(low_text)
+            high = float(high_text)
+        except Exception:
+            return "N"
+        if number < low:
+            return "L"
+        if number > high:
+            return "H"
+        return "N"

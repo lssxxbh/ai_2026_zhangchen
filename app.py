@@ -82,6 +82,29 @@ async def frontend_index():
     )
 
 
+@app.get("/report.html")
+async def frontend_report_html():
+    """
+    访问 /report.html 会直接打开 frontend/report.html
+    """
+    REPORT_FILE = FRONTEND_DIR / "report.html"
+    if REPORT_FILE.exists():
+        return FileResponse(
+            str(REPORT_FILE),
+            media_type="text/html; charset=utf-8"
+        )
+
+    return JSONResponse(
+        {
+            "code": 404,
+            "msg": "frontend/report.html not found",
+            "expected_path": str(REPORT_FILE),
+            "docs": "/docs"
+        },
+        status_code=404
+    )
+
+
 @app.get("/frontend")
 async def frontend_alias():
     """

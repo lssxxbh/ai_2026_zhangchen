@@ -75,6 +75,7 @@ async def get_history(
                     json_result=json_result,
                     file_name=msg.file_name,
                     file_type=msg.file_type,
+                    report_id=msg.report_id,
                     created_at=msg.created_at
                 )
             )

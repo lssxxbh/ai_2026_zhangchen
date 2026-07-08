@@ -15,6 +15,7 @@ class ChatMessageResponse(BaseModel):
     json_result: Optional[Dict[str, Any]] = None
     file_name: Optional[str] = None
     file_type: Optional[str] = None
+    report_id: Optional[str] = None
     created_at: datetime
 
     class Config:

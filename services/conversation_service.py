@@ -47,7 +47,9 @@ class ConversationService:
         message: str,
         json_result: Optional[str] = None,
         file_name: Optional[str] = None,
-        file_type: Optional[str] = None
+        file_type: Optional[str] = None,
+        report_id: Optional[str] = None,
+        visualization_json: Optional[str] = None
     ) -> ChatMessage:
         msg = ChatMessage(
             conversation_id=conv_id,
@@ -55,7 +57,9 @@ class ConversationService:
             message=message,
             json_result=json_result,
             file_name=file_name,
-            file_type=file_type
+            file_type=file_type,
+            report_id=report_id,
+            visualization_json=visualization_json
         )
         self.db.add(msg)
         await self.db.commit()

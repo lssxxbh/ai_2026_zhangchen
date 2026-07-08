@@ -1,5 +1,6 @@
 from pathlib import Path
-from typing import Optional
+from statistics import median
+from typing import Any, Dict, List, Optional, Tuple
 from utils.logger import logger
 
 # 优先尝试 EasyOCR（Python 3.11 更稳定），备选 PaddleOCR
@@ -72,13 +73,29 @@ class OCRService:
     def _preprocess_image(self, image_path: Path) -> Optional[Path]:
         """预处理图片，转换为安全格式"""
         try:
-            from PIL import Image
+            from PIL import Image, ImageEnhance, ImageFilter, ImageOps
             import tempfile
             
             with Image.open(image_path) as img:
                 # 转换为 RGB 模式，避免模式问题
                 if img.mode not in ['RGB', 'L']:
                     img = img.convert('RGB')
+
+                # 检验报告通常是细线表格 + 小字号数字，适当放大和增强对比度能显著减少
+                # 7/T、8/吕、6/G 这类混淆。
+                width, height = img.size
+                target_width = 1800
+                if width < target_width:
+                    scale = target_width / max(width, 1)
+                    img = img.resize(
+                        (target_width, int(height * scale)),
+                        Image.Resampling.LANCZOS
+                    )
+
+                img = ImageOps.grayscale(img)
+                img = ImageOps.autocontrast(img)
+                img = ImageEnhance.Contrast(img).enhance(1.35)
+                img = img.filter(ImageFilter.SHARPEN)
                 
                 # 保存为临时文件
                 temp_path = Path(tempfile.mktemp(suffix='.png'))
@@ -139,13 +156,19 @@ class OCRService:
                 return ""
             
             texts = []
+            detections = []
             for detection in result:
                 if detection and len(detection) > 1:
                     text = detection[1]
                     if text and isinstance(text, str):
                         texts.append(text)
+                        detections.append({
+                            "box": detection[0],
+                            "text": text,
+                            "confidence": detection[2] if len(detection) > 2 else None
+                        })
             
-            full_text = "\n".join(texts)
+            full_text = self._format_detections_as_text(detections) or "\n".join(texts)
             logger.info(f"✅ EasyOCR extracted {len(full_text)} characters")
             return full_text
         except Exception as e:
@@ -166,15 +189,81 @@ class OCRService:
                 return ""
 
             texts = []
+            detections = []
             for line in result[0]:
                 if line and len(line) > 1 and line[1]:
                     text = line[1][0] if len(line[1]) > 0 else ""
                     if text:
                         texts.append(text)
+                        detections.append({
+                            "box": line[0],
+                            "text": text,
+                            "confidence": line[1][1] if len(line[1]) > 1 else None
+                        })
 
-            full_text = "\n".join(texts)
+            full_text = self._format_detections_as_text(detections) or "\n".join(texts)
             logger.info(f"✅ PaddleOCR extracted {len(full_text)} characters")
             return full_text
         except Exception as e:
             logger.error(f"❌ PaddleOCR error: {e}", exc_info=True)
             return None
+
+    def _format_detections_as_text(self, detections: List[Dict[str, Any]]) -> str:
+        """按 OCR 检测框重建阅读顺序，尽量保留表格的行列关系。"""
+        cells = []
+        for item in detections:
+            box = item.get("box")
+            text = str(item.get("text", "")).strip()
+            if not box or not text:
+                continue
+
+            xs, ys = self._box_xy(box)
+            if not xs or not ys:
+                continue
+            height = max(ys) - min(ys)
+            cells.append({
+                "text": text,
+                "x": (min(xs) + max(xs)) / 2,
+                "y": (min(ys) + max(ys)) / 2,
+                "height": max(height, 1),
+            })
+
+        if not cells:
+            return ""
+
+        heights = [cell["height"] for cell in cells]
+        row_threshold = max(12, median(heights) * 0.8)
+        rows: List[Dict[str, Any]] = []
+
+        for cell in sorted(cells, key=lambda c: (c["y"], c["x"])):
+            target = None
+            for row in rows:
+                if abs(cell["y"] - row["y"]) <= row_threshold:
+                    target = row
+                    break
+            if target is None:
+                rows.append({"y": cell["y"], "cells": [cell]})
+            else:
+                target["cells"].append(cell)
+                target["y"] = sum(c["y"] for c in target["cells"]) / len(target["cells"])
+
+        lines = []
+        for row in sorted(rows, key=lambda r: r["y"]):
+            row_cells = sorted(row["cells"], key=lambda c: c["x"])
+            line = "\t".join(cell["text"] for cell in row_cells)
+            if line.strip():
+                lines.append(line)
+        return "\n".join(lines)
+
+    @staticmethod
+    def _box_xy(box: Any) -> Tuple[List[float], List[float]]:
+        xs: List[float] = []
+        ys: List[float] = []
+        try:
+            for point in box:
+                if isinstance(point, (list, tuple)) and len(point) >= 2:
+                    xs.append(float(point[0]))
+                    ys.append(float(point[1]))
+        except Exception:
+            return [], []
+        return xs, ys
