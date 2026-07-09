@@ -2117,6 +2117,7 @@
     let currentConversationId = null;
     let conversationsCache = [];
     let lastJsonResult = null;
+    let currentVisualization = null;
     let selectedFile = null;
     let kgSimulation = null;
     let kgZoomBehavior = null;
@@ -2490,7 +2491,7 @@
 
     function inferRisk(indicators) {
       const arr = normalizeIndicators(indicators);
-      const abnormal = arr.filter(x => /高|低|异常|临界|阳性|风险/i.test(String(x.status))).length;
+      const abnormal = arr.filter(x => /高|低|异常|临界|阳性|风险|偏高|偏低|升高|降低|不正常/i.test(String(x.status))).length;
 
       if (abnormal >= 3) return "中高风险";
       if (abnormal >= 1) return "中等风险";
@@ -2499,8 +2500,8 @@
 
     function statusClass(status) {
       const s = String(status || "");
-      if (/高|异常|阳性|危险|重度/i.test(s)) return "status-high";
-      if (/临界|轻度|偏低|偏高/i.test(s)) return "status-mid";
+      if (/高|异常|阳性|危险|重度|升高|不正常/i.test(s)) return "status-high";
+      if (/临界|轻度|偏低|偏高|降低/i.test(s)) return "status-mid";
       return "status-low";
     }
 
@@ -2611,8 +2612,6 @@
         const res = await apiFetch(`/history/${id}`);
         const data = await res.json();
 
-        console.log("History API response:", JSON.stringify(data, null, 2));
-
         if (data.code === 0) {
           renderHistoryMessages(data.data || []);
         }
@@ -2632,8 +2631,6 @@
         const content = msg.message || msg.content || "";
         const reportId = msg.report_id;
         const hasReport = !!reportId;
-
-        console.log(`Rendering message ${index}: role=${role}, hasReport=${hasReport}, reportId=${reportId}`);
 
         appendMessage(role.includes("user") ? "user" : "assistant", content, false, reportId, hasReport);
 
@@ -2827,11 +2824,17 @@
       renderStats();
     }
 
-    function renderIndicatorTable() {
+    function renderIndicatorTable(visualization = null) {
       const box = qs("indicatorTable");
       box.innerHTML = "";
 
-      const indicators = lastJsonResult?.indicators || [];
+      let indicators = [];
+      const visSource = visualization || currentVisualization;
+      if (visSource) {
+        indicators = visSource.indicators || [];
+      } else if (lastJsonResult) {
+        indicators = lastJsonResult.indicators || [];
+      }
 
       if (!indicators.length) return;
 
@@ -2845,7 +2848,7 @@
         row.className = "data-row";
         row.innerHTML = `
           <span>${escapeHtml(ind.name)}</span>
-          <span>${escapeHtml(ind.value)}</span>
+          <span>${escapeHtml(ind.value)} ${escapeHtml(ind.unit || "")}</span>
           <span>${escapeHtml(ind.reference)}</span>
           <span class="${statusClass(ind.status)}">${escapeHtml(ind.status)}</span>
         `;
@@ -3056,6 +3059,14 @@
           </div>
         </div>
       `;
+
+      currentVisualization = vis;
+      console.log("renderReportData: vis.indicators length =", vis.indicators?.length);
+      const abnormalCount = vis.indicators?.filter(x => /高|低|异常|临界|阳性|风险|偏高|偏低|升高|降低|不正常/i.test(String(x.status))).length || 0;
+      console.log("renderReportData: abnormal count =", abnormalCount);
+      renderStats(vis);
+      renderIndicatorTable(vis);
+      renderAdvice(vis);
     }
 
     function renderReport() {
@@ -3075,26 +3086,28 @@
       }
     }
 
-    function renderAdvice() {
+    function renderAdvice(visualization = null) {
       const box = qs("adviceList");
 
-      if (!lastJsonResult) {
-        box.innerHTML = `
-          <div class="advice-item">
-            <h4>暂无健康建议</h4>
-            <p>请先进入“上传识别”上传报告或输入体检指标。系统会根据返回 JSON 自动生成个性化建议。</p>
-          </div>
-        `;
-        return;
+      let advice = [];
+      const visSource = visualization || currentVisualization;
+      if (visSource) {
+        const rec = visSource.recommendation || {};
+        const allRecommendations = [
+          ...(rec.diet || []).map(r => ({ title: "饮食建议", content: r, tags: [] })),
+          ...(rec.exercise || []).map(r => ({ title: "运动建议", content: r, tags: [] })),
+          ...(rec.follow_up || []).map(r => ({ title: "复查建议", content: r, tags: [] })),
+        ];
+        advice = allRecommendations;
+      } else if (lastJsonResult) {
+        advice = lastJsonResult.advice || [];
       }
-
-      const advice = lastJsonResult.advice || [];
 
       if (!advice.length) {
         box.innerHTML = `
           <div class="advice-item">
-            <h4>暂无可用建议</h4>
-            <p>后端没有返回 advice / recommendations 字段，且前端未能从指标中推断出建议。</p>
+            <h4>暂无健康建议</h4>
+            <p>请先进入“上传识别”上传报告或输入体检指标。系统会根据返回 JSON 自动生成个性化建议。</p>
           </div>
         `;
         return;
@@ -3111,15 +3124,40 @@
       `).join("");
     }
 
-    function renderStats() {
-      const indicators = lastJsonResult?.indicators || [];
-      const abnormal = indicators.filter(x => /高|低|异常|临界|阳性|风险/i.test(String(x.status))).length;
-      const agents = lastJsonResult?.agents || [];
-      const advice = lastJsonResult?.advice || [];
+    function renderStats(visualization = null) {
+      let indicators = [];
+      let abnormal = 0;
+      let agents = [];
+      let advice = [];
+      let riskLevel = "暂无";
+
+      const visSource = visualization || currentVisualization;
+      console.log("renderStats: visSource exists =", !!visSource, "indicators length =", visSource?.indicators?.length);
+      
+      if (visSource) {
+        indicators = visSource.indicators || [];
+        abnormal = indicators.filter(x => /高|低|异常|临界|阳性|风险|偏高|偏低|升高|降低|不正常/i.test(String(x.status))).length;
+        agents = visSource.agents || [];
+        
+        const rec = visSource.recommendation || {};
+        advice = [
+          ...(rec.diet || []),
+          ...(rec.exercise || []),
+          ...(rec.follow_up || [])
+        ];
+        
+        riskLevel = visSource.summary?.risk_level || "暂无";
+      } else if (lastJsonResult) {
+        indicators = lastJsonResult.indicators || [];
+        abnormal = indicators.filter(x => /高|低|异常|临界|阳性|风险|偏高|偏低|升高|降低|不正常/i.test(String(x.status))).length;
+        agents = lastJsonResult.agents || [];
+        advice = lastJsonResult.advice || [];
+        riskLevel = lastJsonResult.risk_level || "暂无";
+      }
 
       qs("statIndicators").textContent = indicators.length;
-      qs("statAbnormal").textContent = abnormal;
-      qs("statRisk").textContent = lastJsonResult?.risk_level || "暂无";
+      qs("statAbnormal").textContent = indicators.length;
+      qs("statRisk").textContent = riskLevel;
       qs("statAgentNum").textContent = agents.length || "--";
       qs("statAdviceNum").textContent = advice.length || "--";
 
@@ -3128,6 +3166,45 @@
         qs("statAccuracy").textContent = avg ? `${avg}%` : "--";
       } else {
         qs("statAccuracy").textContent = "--";
+      }
+    }
+
+    async function loadStatsData() {
+      if (!currentConversationId) {
+        renderStats();
+        return;
+      }
+
+      try {
+        const reportsResponse = await apiFetch(`/chat/${currentConversationId}/reports`);
+        const reportsData = await reportsResponse.json();
+        
+        if (reportsData.code === 0 && reportsData.data && reportsData.data.length > 0) {
+          const latestReport = reportsData.data[reportsData.data.length - 1];
+          const reportId = latestReport.report_id;
+          
+          if (reportId) {
+            const reportResponse = await apiFetch(`/report/${reportId}`);
+            const reportData = await reportResponse.json();
+            
+            if (reportData.code === 0 && reportData.data && reportData.data.visualization) {
+              const vis = reportData.data.visualization;
+              currentVisualization = vis;
+              renderStats(vis);
+              renderIndicatorTable(vis);
+              renderAdvice(vis);
+            } else {
+              renderStats();
+            }
+          } else {
+            renderStats();
+          }
+        } else {
+          renderStats();
+        }
+      } catch (err) {
+        console.error("加载统计数据失败:", err);
+        renderStats();
       }
     }
 
@@ -4083,6 +4160,10 @@
 
         if (key === "kg") {
           setTimeout(drawKnowledgeGraph, 100);
+        }
+
+        if (key === "stats") {
+          loadStatsData();
         }
 
         if (window.gsap) {
