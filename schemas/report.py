@@ -1,4 +1,7 @@
-from pydantic import BaseModel, Field
+# schemas/report.py
+# -*- coding: utf-8 -*-
+
+from pydantic import BaseModel
 from typing import Dict, Any, Optional, List
 
 
@@ -13,11 +16,11 @@ class Summary(BaseModel):
 
 class Indicator(BaseModel):
     name: str
-    abbreviation: str
-    value: float
-    unit: str
-    reference: str
-    status: str
+    abbreviation: str = ""
+    value: float = 0.0
+    unit: str = ""
+    reference: str = "N/A"
+    status: str = "N/A"
 
 
 class Agent(BaseModel):
@@ -25,7 +28,7 @@ class Agent(BaseModel):
     risk_level: str
     confidence: float
     summary: str
-    recommendation: List[str]
+    recommendation: List[str] = []
 
 
 class SimilarCase(BaseModel):
@@ -47,20 +50,45 @@ class KnowledgeItem(BaseModel):
 
 
 class Recommendation(BaseModel):
-    diet: List[str]
-    exercise: List[str]
-    follow_up: List[str]
+    diet: List[str] = []
+    exercise: List[str] = []
+    follow_up: List[str] = []
+
+
+class DepartmentSuggestion(BaseModel):
+    name: str
+    reason: str
+
+
+class RecommendedTest(BaseModel):
+    name: str
+    reason: str
+    priority: str = "建议"
+
+
+class FollowUpPlan(BaseModel):
+    time: str
+    action: str
 
 
 class Visualization(BaseModel):
     summary: Summary
-    indicators: List[Indicator]
-    agents: List[Agent]
-    similar_cases: List[SimilarCase]
-    knowledge_graph: List[KnowledgeGraphItem]
-    knowledge: List[KnowledgeItem]
+    indicators: List[Indicator] = []
+    agents: List[Agent] = []
+
+    # 暂时保留字段，但 A 工程会主动清空，避免无关病例误导
+    similar_cases: List[SimilarCase] = []
+
+    knowledge_graph: List[KnowledgeGraphItem] = []
+    knowledge: List[KnowledgeItem] = []
     recommendation: Recommendation
     warning: str
+
+    # 新增：真正有用的展示字段
+    departments: List[DepartmentSuggestion] = []
+    recommended_tests: List[RecommendedTest] = []
+    follow_up_plan: List[FollowUpPlan] = []
+    red_flags: List[str] = []
 
 
 class ReportParseResponse(BaseModel):
